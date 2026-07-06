@@ -1,10 +1,20 @@
 import { createClient } from "@/utils/supabase/server";
+import { translateText } from "@/utils/translate";
 
 export default async function Home() {
   const supabase = await createClient();
   const { data: cities, error } = await supabase
     .from("cities")
     .select("name, slug, active");
+
+  const sample = "The community's classifieds, and the best eats in town.";
+  let translation: string | null = null;
+  let translationError: string | null = null;
+  try {
+    translation = await translateText(sample, "en");
+  } catch (err) {
+    translationError = err instanceof Error ? err.message : "Unknown error";
+  }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-zinc-50 p-16 font-sans dark:bg-black">
@@ -22,6 +32,21 @@ export default async function Home() {
             </li>
           ))}
         </ul>
+      )}
+
+      <h2 className="mt-8 text-2xl font-semibold text-black dark:text-zinc-50">
+        Translation check
+      </h2>
+      <p className="text-lg text-zinc-700 dark:text-zinc-300">{sample}</p>
+      {translationError && (
+        <p className="text-red-600">
+          Error reaching Anthropic: {translationError}
+        </p>
+      )}
+      {translation && (
+        <p className="text-lg text-zinc-700 dark:text-zinc-300">
+          {translation}
+        </p>
       )}
     </div>
   );
