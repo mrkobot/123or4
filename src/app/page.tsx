@@ -1,8 +1,12 @@
+import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { translateText } from "@/utils/translate";
 
 export default async function Home() {
   const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   const { data: cities, error } = await supabase
     .from("cities")
     .select("name, slug, active");
@@ -21,6 +25,30 @@ export default async function Home() {
       <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
         123or4 — database connectivity check
       </h1>
+
+      {user ? (
+        <div className="flex flex-col items-center gap-2">
+          <p className="text-lg text-zinc-700 dark:text-zinc-300">
+            Signed in as {user.email}
+          </p>
+          <form action="/auth/signout" method="post">
+            <button
+              type="submit"
+              className="rounded-full border border-solid border-black/[.15] px-5 py-2 text-sm font-medium transition-colors hover:bg-black/[.04] dark:border-white/[.2] dark:hover:bg-white/[.08]"
+            >
+              Sign out
+            </button>
+          </form>
+        </div>
+      ) : (
+        <Link
+          href="/login"
+          className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
+        >
+          Sign in
+        </Link>
+      )}
+
       {error && (
         <p className="text-red-600">Error reaching Supabase: {error.message}</p>
       )}
