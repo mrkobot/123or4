@@ -1,5 +1,6 @@
 import { login, signup } from "./actions";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
+import { SubmitButton } from "@/components/SubmitButton";
 
 export default async function LoginPage({
   searchParams,
@@ -43,18 +44,20 @@ export default async function LoginPage({
         {error && <p className="text-sm text-red-600">{error}</p>}
         {message && <p className="text-sm text-green-700">{message}</p>}
         <div className="flex gap-3">
-          <button
+          <SubmitButton
             formAction={login}
+            pendingLabel="Signing in..."
             className="flex-1 rounded-full bg-foreground px-5 py-3 text-base font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
           >
             Sign in
-          </button>
-          <button
+          </SubmitButton>
+          <SubmitButton
             formAction={signup}
+            pendingLabel="Signing up..."
             className="flex-1 rounded-full border border-solid border-black/[.15] px-5 py-3 text-base font-medium transition-colors hover:bg-black/[.04] dark:border-white/[.2] dark:hover:bg-white/[.08]"
           >
             Sign up
-          </button>
+          </SubmitButton>
         </div>
       </form>
     </div>

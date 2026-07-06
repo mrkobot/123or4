@@ -1,7 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createClient } from "@/utils/supabase/server";
+
+async function getOrigin() {
+  const headersList = await headers();
+  return headersList.get("origin") ?? `https://${headersList.get("host")}`;
+}
 
 export async function login(formData: FormData) {
   const supabase = await createClient();
@@ -24,6 +30,9 @@ export async function signup(formData: FormData) {
   const { error } = await supabase.auth.signUp({
     email: formData.get("email") as string,
     password: formData.get("password") as string,
+    options: {
+      emailRedirectTo: `${await getOrigin()}/auth/callback`,
+    },
   });
 
   if (error) {
