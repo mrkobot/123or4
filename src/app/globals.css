@@ -2,25 +2,47 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #14181f;
+  --surface: #ffffff;
+  --surface-muted: #f4f5f7;
+  --border: rgba(20, 24, 31, 0.08);
+  --text-secondary: #6b7280;
+  --coral: #ff5a4d;
+  --coral-deep: #c23f1f;
+  --shadow-card: 0 1px 2px rgba(20, 24, 31, 0.04), 0 8px 24px rgba(20, 24, 31, 0.06);
+  --shadow-card-hover: 0 2px 4px rgba(20, 24, 31, 0.06), 0 16px 32px rgba(20, 24, 31, 0.1);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --color-surface: var(--surface);
+  --color-surface-muted: var(--surface-muted);
+  --color-border: var(--border);
+  --color-text-secondary: var(--text-secondary);
+  --color-coral: var(--coral);
+  --color-coral-deep: var(--coral-deep);
+  --font-sans: var(--font-jakarta);
+  --font-tc: var(--font-noto-tc);
 }
 
 body {
-  background: var(--background);
+  background: var(--surface-muted);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-jakarta), var(--font-noto-tc), sans-serif;
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fade-in-up 0.35s ease-out both;
 }

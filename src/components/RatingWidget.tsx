@@ -47,8 +47,8 @@ export function RatingWidget({
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <div className="flex gap-1">
+    <div className="mt-1 flex items-center gap-4">
+      <div className="flex gap-1.5">
         {[1, 2, 3, 4].map((value) => (
           <button
             key={value}
@@ -56,17 +56,24 @@ export function RatingWidget({
             disabled={pending}
             onClick={() => rate(value)}
             title={RATING_LABELS[value]}
-            className="h-8 w-8 rounded-full border border-black/[.15] text-sm font-medium transition-colors hover:bg-black/[.06] disabled:opacity-50 dark:border-white/[.2] dark:hover:bg-white/[.1]"
+            className="h-8 w-8 rounded-full bg-surface-muted text-sm font-bold text-foreground transition-all hover:bg-coral hover:text-white disabled:opacity-50"
           >
             {value}
           </button>
         ))}
       </div>
-      <span className="text-sm text-zinc-600 dark:text-zinc-400">
-        {communityRating != null
-          ? `${RATING_LABELS[Math.round(communityRating)]} (${voteCount} votes)`
-          : "No ratings yet"}
-      </span>
+      {communityRating != null ? (
+        <span className="flex items-baseline gap-1.5 font-extrabold text-coral">
+          <span className="text-xl">{Math.round(communityRating)}</span>
+          <span className="text-xs font-bold">
+            {RATING_LABELS[Math.round(communityRating)]} · {voteCount} votes
+          </span>
+        </span>
+      ) : (
+        <span className="text-xs font-bold text-text-secondary">
+          No ratings yet
+        </span>
+      )}
     </div>
   );
 }
