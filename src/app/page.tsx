@@ -49,6 +49,13 @@ export default async function Home() {
         </Link>
       )}
 
+      <Link
+        href="/listings"
+        className="text-sm font-medium text-black underline dark:text-zinc-50"
+      >
+        Browse classifieds
+      </Link>
+
       {error && (
         <p className="text-red-600">Error reaching Supabase: {error.message}</p>
       )}
