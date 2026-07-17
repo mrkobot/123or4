@@ -15,13 +15,21 @@ type Listing = {
 };
 
 const CATEGORIES = [
-  { value: "all", label: "All" },
-  { value: "hiring", label: "Hiring" },
-  { value: "rentals", label: "Rentals" },
-  { value: "homes", label: "Homes" },
-  { value: "cars", label: "Cars" },
-  { value: "services", label: "Services" },
+  { value: "all", label: "All", text: "text-foreground", border: "border-foreground" },
+  { value: "hiring", label: "Hiring", text: "text-cat-hiring", border: "border-cat-hiring" },
+  { value: "rentals", label: "Rentals", text: "text-cat-rentals", border: "border-cat-rentals" },
+  { value: "homes", label: "Homes", text: "text-cat-homes", border: "border-cat-homes" },
+  { value: "cars", label: "Cars", text: "text-cat-cars", border: "border-cat-cars" },
+  { value: "services", label: "Services", text: "text-cat-services", border: "border-cat-services" },
 ];
+
+const CATEGORY_TEXT: Record<string, string> = {
+  hiring: "text-cat-hiring",
+  rentals: "text-cat-rentals",
+  homes: "text-cat-homes",
+  cars: "text-cat-cars",
+  services: "text-cat-services",
+};
 
 export function ListingsBrowser({ listings }: { listings: Listing[] }) {
   const [category, setCategory] = useState("all");
@@ -43,8 +51,8 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
             onClick={() => setCategory(c.value)}
             className={`-mb-px border-b-2 pb-3 text-sm font-bold transition-colors ${
               category === c.value
-                ? "border-coral text-coral"
-                : "border-transparent text-foreground/70 hover:text-foreground"
+                ? `${c.border} ${c.text}`
+                : "border-transparent text-foreground/60 hover:text-foreground"
             }`}
           >
             {c.label}
@@ -64,10 +72,12 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
             style={{ animationDelay: `${i * 40}ms` }}
             className="animate-fade-in-up flex flex-col gap-2 rounded-2xl border border-border bg-surface p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
           >
-            <span className="text-xs font-bold uppercase tracking-wide text-coral">
+            <span
+              className={`text-xs font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-foreground"}`}
+            >
               {listing.category}
             </span>
-            <h2 className="text-lg font-bold text-foreground">
+            <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
               {listing.title_en || listing.title_zh}
             </h2>
             {listing.title_en && listing.title_zh && (

@@ -9,6 +9,12 @@
   --text-secondary: #6b7280;
   --coral: #ff5a4d;
   --coral-deep: #c23f1f;
+  --cat-hiring: #e8a33d;
+  --cat-rentals: #4c7ea8;
+  --cat-homes: #4c8a6b;
+  --cat-cars: #6b5b95;
+  --cat-services: #2c8c8c;
+  --cat-eats: #d9971f;
   --shadow-card: 0 1px 2px rgba(20, 24, 31, 0.04), 0 8px 24px rgba(20, 24, 31, 0.06);
   --shadow-card-hover: 0 2px 4px rgba(20, 24, 31, 0.06), 0 16px 32px rgba(20, 24, 31, 0.1);
 }
@@ -22,6 +28,12 @@
   --color-text-secondary: var(--text-secondary);
   --color-coral: var(--coral);
   --color-coral-deep: var(--coral-deep);
+  --color-cat-hiring: var(--cat-hiring);
+  --color-cat-rentals: var(--cat-rentals);
+  --color-cat-homes: var(--cat-homes);
+  --color-cat-cars: var(--cat-cars);
+  --color-cat-services: var(--cat-services);
+  --color-cat-eats: var(--cat-eats);
   --font-sans: var(--font-jakarta);
   --font-tc: var(--font-noto-tc);
 }

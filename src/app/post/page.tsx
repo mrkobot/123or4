@@ -27,64 +27,66 @@ export default async function PostPage({
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-6 bg-zinc-50 p-16 font-sans dark:bg-black">
-      <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
-        Post a classified
-      </h1>
+    <div className="flex min-h-screen flex-col items-center gap-6 p-16">
+      <div className="w-full max-w-md rounded-2xl bg-surface p-8 shadow-[var(--shadow-card)]">
+        <h1 className="mb-6 text-2xl font-extrabold text-foreground">
+          Post a classified
+        </h1>
 
-      <form className="flex w-full max-w-md flex-col gap-3">
-        <label className="text-sm text-zinc-600 dark:text-zinc-400">
-          Category
-          <select
-            name="category"
+        <form className="flex flex-col gap-3">
+          <label className="text-sm font-bold text-text-secondary">
+            Category
+            <select
+              name="category"
+              required
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
+            >
+              {CATEGORIES.map((c) => (
+                <option key={c.value} value={c.value}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+          </label>
+
+          <label className="text-sm font-bold text-text-secondary">
+            Posting in
+            <select
+              name="language"
+              required
+              className="mt-1 w-full rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
+            >
+              <option value="en">English</option>
+              <option value="zh">Traditional Chinese</option>
+            </select>
+          </label>
+
+          <input
+            name="title"
+            type="text"
+            placeholder="Title"
             required
-            className="mt-1 w-full rounded-lg border border-black/[.15] px-4 py-3 dark:border-white/[.2] dark:bg-zinc-900"
-          >
-            {CATEGORIES.map((c) => (
-              <option key={c.value} value={c.value}>
-                {c.label}
-              </option>
-            ))}
-          </select>
-        </label>
-
-        <label className="text-sm text-zinc-600 dark:text-zinc-400">
-          Posting in
-          <select
-            name="language"
+            className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
+          />
+          <textarea
+            name="body"
+            placeholder="Details"
             required
-            className="mt-1 w-full rounded-lg border border-black/[.15] px-4 py-3 dark:border-white/[.2] dark:bg-zinc-900"
+            rows={5}
+            className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
+          />
+
+          {error && <p className="text-sm text-coral-deep">{error}</p>}
+
+          <SubmitButton
+            formAction={postListing}
+            pendingLabel="Posting..."
+            className="rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
           >
-            <option value="en">English</option>
-            <option value="zh">Traditional Chinese</option>
-          </select>
-        </label>
-
-        <input
-          name="title"
-          type="text"
-          placeholder="Title"
-          required
-          className="rounded-lg border border-black/[.15] px-4 py-3 dark:border-white/[.2] dark:bg-zinc-900"
-        />
-        <textarea
-          name="body"
-          placeholder="Details"
-          required
-          rows={5}
-          className="rounded-lg border border-black/[.15] px-4 py-3 dark:border-white/[.2] dark:bg-zinc-900"
-        />
-
-        {error && <p className="text-sm text-red-600">{error}</p>}
-
-        <SubmitButton
-          formAction={postListing}
-          pendingLabel="Posting..."
-          className="rounded-full bg-foreground px-5 py-3 text-base font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-        >
-          Post listing
-        </SubmitButton>
-      </form>
+            Post listing
+          </SubmitButton>
+        </form>
+      </div>
     </div>
   );
 }

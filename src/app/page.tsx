@@ -1,88 +1,81 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
-import { translateText } from "@/utils/translate";
+
+const CATEGORIES = [
+  { label: "Hiring", className: "text-cat-hiring" },
+  { label: "Rentals", className: "text-cat-rentals" },
+  { label: "Homes", className: "text-cat-homes" },
+  { label: "Cars", className: "text-cat-cars" },
+  { label: "Services", className: "text-cat-services" },
+  { label: "Best Eats", className: "text-cat-eats" },
+];
 
 export default async function Home() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  const { data: cities, error } = await supabase
-    .from("cities")
-    .select("name, slug, active");
-
-  const sample = "The community's classifieds, and the best eats in town.";
-  let translation: string | null = null;
-  let translationError: string | null = null;
-  try {
-    translation = await translateText(sample, "en");
-  } catch (err) {
-    translationError = err instanceof Error ? err.message : "Unknown error";
-  }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-4 bg-zinc-50 p-16 font-sans dark:bg-black">
-      <h1 className="text-2xl font-semibold text-black dark:text-zinc-50">
-        123or4 — database connectivity check
-      </h1>
+    <div className="flex min-h-screen flex-col items-center gap-10 p-16">
+      <div className="flex w-full max-w-2xl items-center justify-between">
+        <div className="text-2xl font-extrabold text-foreground">123or4</div>
+        {user ? (
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-text-secondary">{user.email}</span>
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+          >
+            Sign in
+          </Link>
+        )}
+      </div>
 
-      {user ? (
-        <div className="flex flex-col items-center gap-2">
-          <p className="text-lg text-zinc-700 dark:text-zinc-300">
-            Signed in as {user.email}
+      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-2xl bg-surface p-10 shadow-[var(--shadow-card)]">
+        <div>
+          <p className="text-sm font-bold text-coral">
+            Classifieds and Best Eats for Chinese Americans in Phoenix{" "}
+            <span className="font-tc">鳳凰城美國華人分類廣告與美食</span>
           </p>
-          <form action="/auth/signout" method="post">
-            <button
-              type="submit"
-              className="rounded-full border border-solid border-black/[.15] px-5 py-2 text-sm font-medium transition-colors hover:bg-black/[.04] dark:border-white/[.2] dark:hover:bg-white/[.08]"
-            >
-              Sign out
-            </button>
-          </form>
+          <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight text-foreground">
+            The community&rsquo;s classifieds, and the best eats in town.
+          </h1>
         </div>
-      ) : (
-        <Link
-          href="/login"
-          className="rounded-full bg-foreground px-5 py-2 text-sm font-medium text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc]"
-        >
-          Sign in
-        </Link>
-      )}
 
-      <Link
-        href="/listings"
-        className="text-sm font-medium text-black underline dark:text-zinc-50"
-      >
-        Browse classifieds
-      </Link>
-
-      {error && (
-        <p className="text-red-600">Error reaching Supabase: {error.message}</p>
-      )}
-      {cities && (
-        <ul className="text-lg text-zinc-700 dark:text-zinc-300">
-          {cities.map((city) => (
-            <li key={city.slug}>
-              {city.name} — {city.active ? "active" : "inactive"}
-            </li>
+        <div className="flex flex-wrap gap-x-6 gap-y-2">
+          {CATEGORIES.map((c) => (
+            <span key={c.label} className={`text-sm font-bold ${c.className}`}>
+              {c.label}
+            </span>
           ))}
-        </ul>
-      )}
+        </div>
 
-      <h2 className="mt-8 text-2xl font-semibold text-black dark:text-zinc-50">
-        Translation check
-      </h2>
-      <p className="text-lg text-zinc-700 dark:text-zinc-300">{sample}</p>
-      {translationError && (
-        <p className="text-red-600">
-          Error reaching Anthropic: {translationError}
-        </p>
-      )}
-      {translation && (
-        <p className="text-lg text-zinc-700 dark:text-zinc-300">
-          {translation}
-        </p>
-      )}
+        <div className="flex gap-3">
+          <Link
+            href="/listings"
+            className="rounded-full bg-coral px-6 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+          >
+            Browse classifieds
+          </Link>
+          <Link
+            href="/post"
+            className="rounded-full border border-border px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
+          >
+            Post a listing
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }
