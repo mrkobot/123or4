@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { createClient } from "@/utils/supabase/server";
+import { createAdminClient } from "@/utils/supabase/admin";
 import { translateText } from "@/utils/translate";
 
 export async function postListing(formData: FormData) {
@@ -55,7 +56,8 @@ export async function postListing(formData: FormData) {
     const translatedBody = await translateText(body, sourceLang);
     const targetLang = sourceLang === "en" ? "zh" : "en";
 
-    await supabase
+    const admin = createAdminClient();
+    await admin
       .from("listings")
       .update({
         [targetLang === "en" ? "title_en" : "title_zh"]: translatedTitle,
