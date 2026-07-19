@@ -20,12 +20,12 @@ type Listing = {
 };
 
 const CATEGORIES = [
-  { value: "all", label: "All", text: "text-foreground", border: "border-foreground" },
-  { value: "hiring", label: "Hiring", text: "text-cat-hiring", border: "border-cat-hiring" },
-  { value: "rentals", label: "Rentals", text: "text-cat-rentals", border: "border-cat-rentals" },
-  { value: "homes", label: "Homes", text: "text-cat-homes", border: "border-cat-homes" },
-  { value: "cars", label: "Cars", text: "text-cat-cars", border: "border-cat-cars" },
-  { value: "services", label: "Services", text: "text-cat-services", border: "border-cat-services" },
+  { value: "all", label: "All", bg: "bg-foreground" },
+  { value: "hiring", label: "Hiring", bg: "bg-cat-hiring" },
+  { value: "rentals", label: "Rentals", bg: "bg-cat-rentals" },
+  { value: "homes", label: "Homes", bg: "bg-cat-homes" },
+  { value: "cars", label: "Cars", bg: "bg-cat-cars" },
+  { value: "services", label: "Services", bg: "bg-cat-services" },
 ];
 
 const CATEGORY_TEXT: Record<string, string> = {
@@ -121,7 +121,7 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
             onClick={() => setCategory(c.value)}
             className={`rounded-full px-4 py-2 text-sm font-bold transition-colors ${
               category === c.value
-                ? "bg-foreground text-white"
+                ? `${c.bg} text-white`
                 : "bg-surface text-foreground shadow-[var(--shadow-card)] hover:bg-surface-muted"
             }`}
           >

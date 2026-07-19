@@ -15,10 +15,10 @@
   --cat-cars: #6b5b95;
   --cat-services: #2c8c8c;
   --cat-eats: #d9971f;
-  --rate-1: #f2c230;
-  --rate-2: #a9c23f;
-  --rate-3: #4fa97c;
-  --rate-4: #0f6e56;
+  --rate-1: #fbbf24;
+  --rate-2: #a8cc3a;
+  --rate-3: #4cad7d;
+  --rate-4: #0f766e;
   --shadow-card: 0 1px 2px rgba(20, 24, 31, 0.04), 0 8px 24px rgba(20, 24, 31, 0.06);
   --shadow-card-hover: 0 2px 4px rgba(20, 24, 31, 0.06), 0 16px 32px rgba(20, 24, 31, 0.1);
 }
