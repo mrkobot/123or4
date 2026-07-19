@@ -73,7 +73,7 @@ export default async function Home() {
 
       <div className="w-full max-w-6xl px-8 py-8">
         <h1 className="font-tc text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
-          本市的<span className="text-coral">分類廣告</span>與<span className="text-coral">最佳美食</span>
+          本市的<span className="text-coral">分類廣告</span>與<span className="text-coral">美食</span>
         </h1>
         <h1 className="mt-3 text-2xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-3xl">
           Our city&rsquo;s <span className="text-coral">classifieds</span> and
