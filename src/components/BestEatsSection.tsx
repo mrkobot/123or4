@@ -5,7 +5,7 @@ import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 import { RATING_LABELS } from "@/utils/ratings";
-import { Bi } from "@/components/LanguageProvider";
+import { Bi, TitlePair } from "@/components/LanguageProvider";
 
 type Review = {
   id: string;
@@ -17,7 +17,8 @@ type Review = {
   restaurant: {
     name_en: string;
     name_zh: string;
-    cuisine: string | null;
+    cuisine_en: string | null;
+    cuisine_zh: string | null;
     address: string | null;
     photos: string[] | null;
   } | null;
@@ -46,7 +47,8 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
         !q ||
         r.restaurant?.name_en?.toLowerCase().includes(q) ||
         r.restaurant?.name_zh?.includes(q) ||
-        r.restaurant?.cuisine?.toLowerCase().includes(q);
+        r.restaurant?.cuisine_en?.toLowerCase().includes(q) ||
+        r.restaurant?.cuisine_zh?.includes(q);
       return matchesLocation && matchesQuery;
     });
   }, [reviews, location, query]);
@@ -110,14 +112,18 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
             <span className="text-xs font-bold uppercase tracking-wide text-cat-eats">
               <Bi en="This week's pick" zh="本週精選" />
             </span>
-            <h3 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">
-              {featured.restaurant?.name_en}
-            </h3>
-            <h3 className="font-tc text-2xl font-extrabold tracking-tight text-foreground">
-              {featured.restaurant?.name_zh}
-            </h3>
+            <TitlePair
+              en={featured.restaurant?.name_en}
+              zh={featured.restaurant?.name_zh}
+              headClassName="mt-1 text-2xl font-extrabold tracking-tight text-foreground"
+              subClassName="text-sm font-bold text-text-secondary"
+            />
             <p className="mt-1 text-sm text-text-secondary">
-              {featured.restaurant?.cuisine} · {featured.restaurant?.address}
+              <Bi
+                en={featured.restaurant?.cuisine_en ?? ""}
+                zh={featured.restaurant?.cuisine_zh ?? ""}
+              />{" "}
+              · {featured.restaurant?.address}
             </p>
             {featured.editor && (
               <p className="mt-2 text-xs font-bold text-text-secondary">
@@ -170,14 +176,17 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
               <PlaceholderPhoto category="eats" />
             )}
             <div className="flex flex-col gap-1 p-5">
-              <h3 className="text-lg font-extrabold tracking-tight text-foreground">
-                {review.restaurant?.name_en}
-              </h3>
-              <h3 className="font-tc text-lg font-extrabold tracking-tight text-foreground">
-                {review.restaurant?.name_zh}
-              </h3>
+              <TitlePair
+                en={review.restaurant?.name_en}
+                zh={review.restaurant?.name_zh}
+                headClassName="text-lg font-extrabold tracking-tight text-foreground"
+                subClassName="text-xs font-bold text-text-secondary"
+              />
               <p className="text-xs text-text-secondary">
-                {review.restaurant?.cuisine}
+                <Bi
+                  en={review.restaurant?.cuisine_en ?? ""}
+                  zh={review.restaurant?.cuisine_zh ?? ""}
+                />
               </p>
               <div className="mt-1 text-sm font-extrabold text-foreground">
                 {review.editor_rating}{" "}

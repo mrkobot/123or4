@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
-import { Bi } from "@/components/LanguageProvider";
+import { Bi, TitlePair } from "@/components/LanguageProvider";
 
 type Listing = {
   id: string;
@@ -69,16 +69,12 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         >
           {cat ? <Bi en={cat.en} zh={cat.zh} /> : listing.category}
         </span>
-        {listing.title_en && (
-          <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
-            {listing.title_en}
-          </h2>
-        )}
-        {listing.title_zh && (
-          <h2 className="font-tc text-2xl font-extrabold tracking-tight text-foreground">
-            {listing.title_zh}
-          </h2>
-        )}
+        <TitlePair
+          en={listing.title_en}
+          zh={listing.title_zh}
+          headClassName="text-2xl font-extrabold tracking-tight text-foreground"
+          subClassName="text-sm font-bold text-text-secondary"
+        />
         {listing.price != null && (
           <p className="text-lg font-extrabold text-foreground">
             ${listing.price.toLocaleString()}

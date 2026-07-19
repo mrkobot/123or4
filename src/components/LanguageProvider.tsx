@@ -56,3 +56,37 @@ export function Bi({
     </>
   );
 }
+
+// For headline-scale content (post/restaurant titles): the toggle
+// language renders as the prominent headline, the other language as a
+// smaller subhead directly below — never hidden, just de-emphasized.
+export function TitlePair({
+  en,
+  zh,
+  headClassName,
+  subClassName,
+}: {
+  en: string | null | undefined;
+  zh: string | null | undefined;
+  headClassName?: string;
+  subClassName?: string;
+}) {
+  const lang = useLanguage();
+  const [head, headIsZh, sub, subIsZh] =
+    lang === "zh" ? [zh, true, en, false] : [en, false, zh, true];
+
+  return (
+    <>
+      {head && (
+        <h2 className={`${headClassName ?? ""} ${headIsZh ? "font-tc" : ""}`}>
+          {head}
+        </h2>
+      )}
+      {sub && (
+        <p className={`${subClassName ?? ""} ${subIsZh ? "font-tc" : ""}`}>
+          {sub}
+        </p>
+      )}
+    </>
+  );
+}
