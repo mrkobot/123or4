@@ -6,10 +6,10 @@ import { LanguageToggle } from "@/components/LanguageToggle";
 import { getLanguage, CHROME } from "@/utils/language";
 
 const LISTING_FIELDS =
-  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
+  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, photos, city:cities(name)";
 
 const REVIEW_FIELDS =
-  "id, body_en, body_zh, editor_rating, community_rating, vote_count, restaurant:restaurants(name_en, name_zh, cuisine, address), editor:editors(name)";
+  "id, body_en, body_zh, editor_rating, community_rating, vote_count, restaurant:restaurants(name_en, name_zh, cuisine, address, photos), editor:editors(name)";
 
 export default async function Home() {
   const supabase = await createClient();

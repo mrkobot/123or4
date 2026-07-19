@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
+import { createClient } from "@/utils/supabase/client";
 
 const CATEGORIES = [
   { value: "hiring", label: "Hiring" },
@@ -50,12 +51,33 @@ export function PostForm({
   const [language, setLanguage] = useState<"en" | "zh">("en");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
+  const supabase = createClient();
 
   const titlePreview = useDebouncedTranslation(title, language);
   const bodyPreview = useDebouncedTranslation(body, language);
 
   const otherLangLabel = language === "en" ? "Traditional Chinese" : "English";
   const previewFontClass = language === "en" ? "font-tc" : "";
+
+  async function handleFiles(files: FileList | null) {
+    if (!files || files.length === 0) return;
+    setUploading(true);
+    const uploaded: string[] = [];
+    for (const file of Array.from(files)) {
+      const path = `listings/${crypto.randomUUID()}-${file.name}`;
+      const { error: uploadError } = await supabase.storage
+        .from("photos")
+        .upload(path, file);
+      if (!uploadError) {
+        const { data } = supabase.storage.from("photos").getPublicUrl(path);
+        uploaded.push(data.publicUrl);
+      }
+    }
+    setPhotoUrls((prev) => [...prev, ...uploaded]);
+    setUploading(false);
+  }
 
   return (
     <form className="flex flex-col gap-3">
@@ -106,6 +128,34 @@ export function PostForm({
         onChange={(e) => setBody(e.target.value)}
         className={`rounded-lg border border-border bg-surface px-4 py-3 text-foreground ${language === "zh" ? "font-tc" : ""}`}
       />
+
+      <label className="text-sm font-bold text-text-secondary">
+        Photos
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onChange={(e) => handleFiles(e.target.files)}
+          className="mt-1 block w-full text-sm text-foreground"
+        />
+      </label>
+      {uploading && (
+        <p className="text-xs font-bold text-text-secondary">Uploading...</p>
+      )}
+      {photoUrls.length > 0 && (
+        <div className="flex flex-wrap gap-2">
+          {photoUrls.map((url) => (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              key={url}
+              src={url}
+              alt=""
+              className="h-16 w-16 rounded-lg object-cover"
+            />
+          ))}
+        </div>
+      )}
+      <input type="hidden" name="photos" value={JSON.stringify(photoUrls)} />
 
       {(title || body) && (
         <div className="rounded-lg bg-surface-muted p-4">

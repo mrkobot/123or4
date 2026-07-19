@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
+import { PhotoCarousel } from "@/components/PhotoCarousel";
 
 type Listing = {
   id: string;
@@ -16,6 +17,7 @@ type Listing = {
   created_at: string;
   community_rating: number | null;
   vote_count: number;
+  photos: string[] | null;
   city: { name: string }[] | null;
 };
 
@@ -50,53 +52,57 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
   return (
     <div
       style={{ animationDelay: `${delay}ms` }}
-      className="animate-fade-in-up flex flex-col gap-2 rounded-2xl border border-border bg-surface p-6 shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+      className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
     >
-      <span
-        className={`text-xs font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-foreground"}`}
-      >
-        {listing.category}
-      </span>
-      {listing.title_en && (
-        <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
-          {listing.title_en}
-        </h2>
-      )}
-      {listing.title_zh && (
-        <h2 className="font-tc text-2xl font-extrabold tracking-tight text-foreground">
-          {listing.title_zh}
-        </h2>
-      )}
-      {listing.price != null && (
-        <p className="text-lg font-extrabold text-foreground">
-          ${listing.price.toLocaleString()}
-          {listing.category === "rentals" && (
-            <span className="text-sm font-bold text-text-secondary"> /mo</span>
-          )}
-        </p>
-      )}
-      {listing.body_en && <p className="text-foreground/80">{listing.body_en}</p>}
-      {listing.body_zh && (
-        <p className="font-tc text-foreground/80">{listing.body_zh}</p>
-      )}
+      <PhotoCarousel photos={listing.photos ?? []} />
 
-      <div className="flex items-center gap-2 text-xs text-text-secondary">
-        {listing.verified && (
-          <span className="rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase text-white">
-            Verified
-          </span>
-        )}
-        <span>
-          {listing.city?.[0]?.name ?? "Phoenix"} · {relativeTime(listing.created_at)}
+      <div className="flex flex-col gap-2 p-6">
+        <span
+          className={`text-xs font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-foreground"}`}
+        >
+          {listing.category}
         </span>
-      </div>
+        {listing.title_en && (
+          <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
+            {listing.title_en}
+          </h2>
+        )}
+        {listing.title_zh && (
+          <h2 className="font-tc text-2xl font-extrabold tracking-tight text-foreground">
+            {listing.title_zh}
+          </h2>
+        )}
+        {listing.price != null && (
+          <p className="text-lg font-extrabold text-foreground">
+            ${listing.price.toLocaleString()}
+            {listing.category === "rentals" && (
+              <span className="text-sm font-bold text-text-secondary"> /mo</span>
+            )}
+          </p>
+        )}
+        {listing.body_en && <p className="text-foreground/80">{listing.body_en}</p>}
+        {listing.body_zh && (
+          <p className="font-tc text-foreground/80">{listing.body_zh}</p>
+        )}
 
-      <RatingWidget
-        itemType="listing"
-        itemId={listing.id}
-        communityRating={listing.community_rating}
-        voteCount={listing.vote_count}
-      />
+        <div className="flex items-center gap-2 text-xs text-text-secondary">
+          {listing.verified && (
+            <span className="rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase text-white">
+              Verified
+            </span>
+          )}
+          <span>
+            {listing.city?.[0]?.name ?? "Phoenix"} · {relativeTime(listing.created_at)}
+          </span>
+        </div>
+
+        <RatingWidget
+          itemType="listing"
+          itemId={listing.id}
+          communityRating={listing.community_rating}
+          voteCount={listing.vote_count}
+        />
+      </div>
     </div>
   );
 }

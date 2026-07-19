@@ -3,7 +3,7 @@ import { createClient } from "@/utils/supabase/server";
 import { ListingsBrowser } from "@/components/ListingsBrowser";
 
 const LISTING_FIELDS =
-  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
+  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, photos, city:cities(name)";
 
 export default async function ListingsPage() {
   const supabase = await createClient();

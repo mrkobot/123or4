@@ -19,6 +19,12 @@ export async function postListing(formData: FormData) {
   const title = formData.get("title") as string;
   const body = formData.get("body") as string;
   const sourceLang = formData.get("language") as "en" | "zh";
+  let photos: string[] = [];
+  try {
+    photos = JSON.parse((formData.get("photos") as string) ?? "[]");
+  } catch {
+    photos = [];
+  }
 
   const { data: city } = await supabase
     .from("cities")
@@ -39,6 +45,7 @@ export async function postListing(formData: FormData) {
       translation_source: sourceLang,
       machine_translated: true,
       status: "active",
+      photos,
       [sourceLang === "en" ? "title_en" : "title_zh"]: title,
       [sourceLang === "en" ? "body_en" : "body_zh"]: body,
     })
