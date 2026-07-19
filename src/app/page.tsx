@@ -130,7 +130,7 @@ export default async function Home() {
         <ListingsBrowser listings={listings ?? []} />
       </div>
 
-      <div id="best-eats" className="w-full scroll-mt-6">
+      <div id="best-eats" className="flex w-full scroll-mt-6 justify-center">
         <BestEatsSection
           reviews={reviews}
           heading={t.bestEats}
