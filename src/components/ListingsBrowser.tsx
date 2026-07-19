@@ -58,7 +58,7 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
 
       <div className="flex flex-col gap-2 p-6">
         <span
-          className={`text-xs font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-foreground"}`}
+          className={`w-fit rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
         >
           {listing.category}
         </span>
