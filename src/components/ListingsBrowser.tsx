@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 
 type Listing = {
   id: string;
@@ -54,7 +55,11 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
       style={{ animationDelay: `${delay}ms` }}
       className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
     >
-      <PhotoCarousel photos={listing.photos ?? []} />
+      {listing.photos && listing.photos.length > 0 ? (
+        <PhotoCarousel photos={listing.photos} />
+      ) : (
+        <PlaceholderPhoto category={listing.category} />
+      )}
 
       <div className="flex flex-col gap-2 p-6">
         <span

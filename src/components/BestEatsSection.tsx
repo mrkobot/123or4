@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
+import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 
 const RATING_LABELS: Record<number, string> = {
   1: "Meh",
@@ -110,10 +111,14 @@ export function BestEatsSection({
 
       {featured && (
         <div className="mb-4 flex flex-col gap-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] md:flex-row">
-          <PhotoCarousel
-            photos={featured.restaurant?.photos ?? []}
-            className="h-56 md:h-auto md:w-2/5"
-          />
+          {featured.restaurant?.photos && featured.restaurant.photos.length > 0 ? (
+            <PhotoCarousel
+              photos={featured.restaurant.photos}
+              className="h-56 md:h-auto md:w-2/5"
+            />
+          ) : (
+            <PlaceholderPhoto category="eats" className="h-56 md:h-auto md:w-2/5" />
+          )}
           <div className="flex-1 p-6">
             <span className="text-xs font-bold uppercase tracking-wide text-cat-eats">
               This week&rsquo;s pick
@@ -167,7 +172,11 @@ export function BestEatsSection({
             key={review.id}
             className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]"
           >
-            <PhotoCarousel photos={review.restaurant?.photos ?? []} />
+            {review.restaurant?.photos && review.restaurant.photos.length > 0 ? (
+              <PhotoCarousel photos={review.restaurant.photos} />
+            ) : (
+              <PlaceholderPhoto category="eats" />
+            )}
             <div className="flex flex-col gap-1 p-5">
               <h3 className="text-lg font-extrabold tracking-tight text-foreground">
                 {review.restaurant?.name_en}
