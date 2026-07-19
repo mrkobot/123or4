@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { RATING_LABELS } from "@/utils/ratings";
+import { RATING_LABELS, RATE_HEX } from "@/utils/ratings";
 import { Bi } from "@/components/LanguageProvider";
 
 const RATE_STYLES: Record<number, { bg: string; text: string }> = {
@@ -13,21 +13,51 @@ const RATE_STYLES: Record<number, { bg: string; text: string }> = {
   4: { bg: "bg-rate-4", text: "text-white" },
 };
 
+const CONFETTI_DOTS = 5;
+
+function burstConfetti(button: HTMLElement, color: string) {
+  for (let i = 0; i < CONFETTI_DOTS; i++) {
+    const dot = document.createElement("span");
+    dot.className = "rate-confetti-dot";
+    dot.style.background = color;
+    const angle = (Math.PI * 2 * i) / CONFETTI_DOTS;
+    const dist = 32 + Math.random() * 16;
+    dot.style.setProperty(
+      "--tx",
+      `translate(${Math.cos(angle) * dist}px, ${Math.sin(angle) * dist}px)`,
+    );
+    button.appendChild(dot);
+    setTimeout(() => dot.remove(), 650);
+  }
+
+  const ring = document.createElement("span");
+  ring.className = "rate-ring";
+  ring.style.background = color;
+  button.appendChild(ring);
+  setTimeout(() => ring.remove(), 550);
+
+  button.classList.add("rate-btn-popping");
+  setTimeout(() => button.classList.remove("rate-btn-popping"), 450);
+}
+
 export function RatingWidget({
   itemType,
   itemId,
   communityRating,
   voteCount,
+  onVote,
 }: {
   itemType: "listing" | "review";
   itemId: string;
   communityRating: number | null;
   voteCount: number;
+  onVote?: (value: number) => void;
 }) {
   const [pending, setPending] = useState(false);
   const [myRating, setMyRating] = useState<number | null>(null);
   const router = useRouter();
   const supabase = createClient();
+  const btnRefs = useRef<Record<number, HTMLButtonElement | null>>({});
 
   useEffect(() => {
     let cancelled = false;
@@ -54,22 +84,26 @@ export function RatingWidget({
 
   async function rate(value: number) {
     if (myRating != null) return;
-    setPending(true);
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
-
     if (!user) {
       router.push("/login");
       return;
     }
+
+    const btn = btnRefs.current[value];
+    if (btn) burstConfetti(btn, RATE_HEX[value]);
+    onVote?.(value);
+    setMyRating(value);
+    setPending(true);
 
     await supabase.rpc("cast_rating", {
       p_item_type: itemType,
       p_item_id: itemId,
       p_value: value,
     });
-    setMyRating(value);
     setPending(false);
     router.refresh();
   }
@@ -93,10 +127,13 @@ export function RatingWidget({
           {[1, 2, 3, 4].map((value) => (
             <button
               key={value}
+              ref={(el) => {
+                btnRefs.current[value] = el;
+              }}
               type="button"
               disabled={pending}
               onClick={() => rate(value)}
-              className={`flex flex-col items-center rounded-xl py-2.5 opacity-80 transition-all hover:opacity-100 disabled:opacity-50 ${RATE_STYLES[value].bg} ${RATE_STYLES[value].text}`}
+              className={`relative flex flex-col items-center overflow-visible rounded-xl py-2.5 opacity-80 transition-all hover:opacity-100 disabled:opacity-50 ${RATE_STYLES[value].bg} ${RATE_STYLES[value].text}`}
             >
               <span className="text-xl font-extrabold leading-none">
                 {value}

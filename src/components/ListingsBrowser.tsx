@@ -5,6 +5,7 @@ import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 import { Bi, TitlePair } from "@/components/LanguageProvider";
+import { RATE_HEX } from "@/utils/ratings";
 
 type Listing = {
   id: string;
@@ -52,10 +53,21 @@ function relativeTime(iso: string) {
 
 function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
   const cat = CATEGORIES.find((c) => c.value === listing.category);
+  const [flashRate, setFlashRate] = useState<number | null>(null);
+
+  function handleVote(value: number) {
+    setFlashRate(value);
+    setTimeout(() => setFlashRate(null), 1400);
+  }
+
   return (
     <div
-      style={{ animationDelay: `${delay}ms` }}
-      className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+      style={{
+        animationDelay: `${delay}ms`,
+        borderColor: flashRate ? RATE_HEX[flashRate] : undefined,
+        transition: "border-color 400ms ease",
+      }}
+      className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
     >
       {listing.photos && listing.photos.length > 0 ? (
         <PhotoCarousel photos={listing.photos} />
@@ -107,6 +119,7 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
           itemId={listing.id}
           communityRating={listing.community_rating}
           voteCount={listing.vote_count}
+          onVote={handleVote}
         />
       </div>
     </div>

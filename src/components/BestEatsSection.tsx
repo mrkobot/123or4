@@ -6,6 +6,7 @@ import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 import { RATING_LABELS } from "@/utils/ratings";
 import { Bi, TitlePair } from "@/components/LanguageProvider";
+import { RATE_HEX } from "@/utils/ratings";
 
 type Review = {
   id: string;
@@ -32,6 +33,7 @@ function locationOf(address: string | null) {
 export function BestEatsSection({ reviews }: { reviews: Review[] }) {
   const [location, setLocation] = useState("all");
   const [query, setQuery] = useState("");
+  const [flashRate, setFlashRate] = useState<number | null>(null);
 
   const locations = useMemo(
     () => Array.from(new Set(reviews.map((r) => locationOf(r.restaurant?.address ?? null)))),
@@ -56,6 +58,11 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) return null;
 
   const [featured, ...rest] = filtered.length > 0 ? filtered : reviews;
+
+  function handleVote(value: number) {
+    setFlashRate(value);
+    setTimeout(() => setFlashRate(null), 1400);
+  }
 
   return (
     <div className="w-full max-w-6xl px-8 pb-16">
@@ -99,7 +106,13 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
       </div>
 
       {featured && (
-        <div className="mb-4 flex flex-col gap-0 overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)] md:flex-row">
+        <div
+          style={{
+            borderColor: flashRate ? RATE_HEX[flashRate] : undefined,
+            transition: "border-color 400ms ease",
+          }}
+          className="mb-4 flex flex-col gap-0 overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[var(--shadow-card)] md:flex-row"
+        >
           {featured.restaurant?.photos && featured.restaurant.photos.length > 0 ? (
             <PhotoCarousel
               photos={featured.restaurant.photos}
@@ -154,6 +167,7 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
               itemId={featured.id}
               communityRating={featured.community_rating}
               voteCount={featured.vote_count}
+              onVote={handleVote}
             />
           </div>
         </div>
