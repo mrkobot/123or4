@@ -1,11 +1,15 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { ListingsBrowser } from "@/components/ListingsBrowser";
+import { BestEatsSection } from "@/components/BestEatsSection";
 import { LanguageToggle } from "@/components/LanguageToggle";
 import { getLanguage, CHROME } from "@/utils/language";
 
 const LISTING_FIELDS =
   "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
+
+const REVIEW_FIELDS =
+  "id, body_en, body_zh, editor_rating, community_rating, vote_count, restaurant:restaurants(name_en, name_zh, cuisine, address), editor:editors(name)";
 
 export default async function Home() {
   const supabase = await createClient();
@@ -18,6 +22,19 @@ export default async function Home() {
     .eq("status", "active")
     .order("created_at", { ascending: false })
     .limit(9);
+
+  const { data: reviewsRaw } = await supabase
+    .from("reviews")
+    .select(REVIEW_FIELDS)
+    .eq("status", "published")
+    .order("created_at", { ascending: false })
+    .limit(6);
+
+  const reviews = (reviewsRaw ?? []).map((r) => ({
+    ...r,
+    restaurant: Array.isArray(r.restaurant) ? r.restaurant[0] ?? null : r.restaurant,
+    editor: Array.isArray(r.editor) ? r.editor[0] ?? null : r.editor,
+  }));
 
   const lang = await getLanguage();
   const t = CHROME[lang];
@@ -41,9 +58,12 @@ export default async function Home() {
           >
             {t.classifieds}
           </Link>
-          <span className={`text-sm font-bold text-foreground/40 ${fontClass}`}>
+          <Link
+            href="#best-eats"
+            className={`text-sm font-bold text-foreground ${fontClass}`}
+          >
             {t.bestEats}
-          </span>
+          </Link>
           {user ? (
             <form action="/auth/signout" method="post">
               <button
@@ -108,6 +128,14 @@ export default async function Home() {
           </Link>
         </div>
         <ListingsBrowser listings={listings ?? []} />
+      </div>
+
+      <div id="best-eats" className="w-full scroll-mt-6">
+        <BestEatsSection
+          reviews={reviews}
+          heading={t.bestEats}
+          fontClass={fontClass}
+        />
       </div>
     </div>
   );
