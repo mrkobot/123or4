@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { createClient } from "@/utils/supabase/client";
+import { Bi } from "@/components/LanguageProvider";
 
 const CATEGORIES = [
-  { value: "hiring", label: "Hiring" },
-  { value: "rentals", label: "Rentals" },
-  { value: "homes", label: "Homes" },
-  { value: "cars", label: "Cars" },
-  { value: "services", label: "Services" },
+  { value: "hiring", en: "Hiring", zh: "徵才" },
+  { value: "rentals", en: "Rentals", zh: "租屋" },
+  { value: "homes", en: "Homes", zh: "房屋" },
+  { value: "cars", en: "Cars", zh: "汽車" },
+  { value: "services", en: "Services", zh: "服務" },
 ];
 
 function useDebouncedTranslation(text: string, sourceLang: "en" | "zh") {
@@ -58,7 +59,6 @@ export function PostForm({
   const titlePreview = useDebouncedTranslation(title, language);
   const bodyPreview = useDebouncedTranslation(body, language);
 
-  const otherLangLabel = language === "en" ? "Traditional Chinese" : "English";
   const previewFontClass = language === "en" ? "font-tc" : "";
 
   async function handleFiles(files: FileList | null) {
@@ -82,7 +82,7 @@ export function PostForm({
   return (
     <form className="flex flex-col gap-3">
       <label className="text-sm font-bold text-text-secondary">
-        Category
+        <Bi en="Category" zh="分類" />
         <select
           name="category"
           required
@@ -90,14 +90,14 @@ export function PostForm({
         >
           {CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>
-              {c.label}
+              {c.en} / {c.zh}
             </option>
           ))}
         </select>
       </label>
 
       <label className="text-sm font-bold text-text-secondary">
-        Posting in
+        <Bi en="Posting in" zh="使用語言張貼" />
         <select
           name="language"
           required
@@ -105,15 +105,15 @@ export function PostForm({
           onChange={(e) => setLanguage(e.target.value as "en" | "zh")}
           className="mt-1 w-full rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
         >
-          <option value="en">English</option>
-          <option value="zh">Traditional Chinese</option>
+          <option value="en">English / 英文</option>
+          <option value="zh">Traditional Chinese / 繁體中文</option>
         </select>
       </label>
 
       <input
         name="title"
         type="text"
-        placeholder="Title"
+        placeholder="Title / 標題"
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -121,7 +121,7 @@ export function PostForm({
       />
       <textarea
         name="body"
-        placeholder="Details"
+        placeholder="Details / 內容"
         required
         rows={5}
         value={body}
@@ -130,7 +130,7 @@ export function PostForm({
       />
 
       <label className="text-sm font-bold text-text-secondary">
-        Photos
+        <Bi en="Photos" zh="照片" />
         <input
           type="file"
           accept="image/*"
@@ -140,7 +140,9 @@ export function PostForm({
         />
       </label>
       {uploading && (
-        <p className="text-xs font-bold text-text-secondary">Uploading...</p>
+        <p className="text-xs font-bold text-text-secondary">
+          <Bi en="Uploading..." zh="上傳中..." />
+        </p>
       )}
       {photoUrls.length > 0 && (
         <div className="flex flex-wrap gap-2">
@@ -160,8 +162,13 @@ export function PostForm({
       {(title || body) && (
         <div className="rounded-lg bg-surface-muted p-4">
           <p className="mb-2 text-xs font-bold uppercase tracking-wide text-text-secondary">
-            Preview in {otherLangLabel}
-            {(titlePreview.loading || bodyPreview.loading) && " · translating..."}
+            <Bi en="Preview" zh="預覽" />
+            {(titlePreview.loading || bodyPreview.loading) && (
+              <>
+                {" · "}
+                <Bi en="translating..." zh="翻譯中..." />
+              </>
+            )}
           </p>
           {titlePreview.translation && (
             <p className={`text-lg font-extrabold text-foreground ${previewFontClass}`}>
@@ -180,10 +187,10 @@ export function PostForm({
 
       <SubmitButton
         formAction={formAction}
-        pendingLabel="Posting..."
+        pendingLabel="Posting... / 張貼中..."
         className="rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
       >
-        Post listing
+        <Bi en="Post listing" zh="張貼廣告" />
       </SubmitButton>
     </form>
   );

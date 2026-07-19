@@ -1,3 +1,5 @@
+import { Bi } from "@/components/LanguageProvider";
+
 const PLACEHOLDER_IMAGES: Record<string, string> = {
   hiring: "https://picsum.photos/seed/123or4-hiring/800/600",
   rentals: "https://picsum.photos/seed/123or4-rentals/800/600",
@@ -40,7 +42,7 @@ export function PlaceholderPhoto({
         style={{ backgroundColor: color, mixBlendMode: "multiply", opacity: 0.6 }}
       />
       <span className="absolute bottom-2 left-2 rounded-full bg-black/40 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wide text-white">
-        No photo yet
+        <Bi en="No photo yet" zh="尚無照片" />
       </span>
     </div>
   );

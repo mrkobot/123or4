@@ -3,13 +3,8 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-
-const RATING_LABELS: Record<number, string> = {
-  1: "Meh",
-  2: "Average",
-  3: "Good",
-  4: "Excellent",
-};
+import { RATING_LABELS } from "@/utils/ratings";
+import { Bi } from "@/components/LanguageProvider";
 
 const RATE_STYLES: Record<number, { bg: string; text: string }> = {
   1: { bg: "bg-rate-1", text: "text-white" },
@@ -89,7 +84,8 @@ export function RatingWidget({
             {myRating}
           </span>
           <span className="text-xs font-bold">
-            You rated this {RATING_LABELS[myRating]}
+            <Bi en="You rated this" zh="你的評分" />{" "}
+            <Bi en={RATING_LABELS[myRating].en} zh={RATING_LABELS[myRating].zh} />
           </span>
         </div>
       ) : (
@@ -105,8 +101,10 @@ export function RatingWidget({
               <span className="text-xl font-extrabold leading-none">
                 {value}
               </span>
-              <span className="mt-0.5 text-[11px] font-bold leading-none">
-                {RATING_LABELS[value]}
+              <span className="mt-0.5 text-center text-[10px] font-bold leading-tight">
+                {RATING_LABELS[value].en}
+                <br />
+                <span className="font-tc">{RATING_LABELS[value].zh}</span>
               </span>
             </button>
           ))}
@@ -114,12 +112,17 @@ export function RatingWidget({
       )}
       {communityRating != null ? (
         <span className="text-xs font-bold text-text-secondary">
-          Community: {Math.round(communityRating)}{" "}
-          {RATING_LABELS[Math.round(communityRating)]} · {voteCount} votes
+          <Bi en="Community" zh="社群評分" />:{" "}
+          {Math.round(communityRating)}{" "}
+          <Bi
+            en={RATING_LABELS[Math.round(communityRating)].en}
+            zh={RATING_LABELS[Math.round(communityRating)].zh}
+          />{" "}
+          · {voteCount} <Bi en="votes" zh="票" />
         </span>
       ) : (
         <span className="text-xs font-bold text-text-secondary">
-          No ratings yet
+          <Bi en="No ratings yet" zh="尚無評分" />
         </span>
       )}
     </div>

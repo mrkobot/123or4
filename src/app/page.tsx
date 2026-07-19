@@ -3,7 +3,8 @@ import { createClient } from "@/utils/supabase/server";
 import { ListingsBrowser } from "@/components/ListingsBrowser";
 import { BestEatsSection } from "@/components/BestEatsSection";
 import { LanguageToggle } from "@/components/LanguageToggle";
-import { getLanguage, CHROME } from "@/utils/language";
+import { Bi } from "@/components/LanguageProvider";
+import { getLanguage } from "@/utils/language";
 
 const LISTING_FIELDS =
   "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, photos, city:cities(name)";
@@ -37,8 +38,6 @@ export default async function Home() {
   }));
 
   const lang = await getLanguage();
-  const t = CHROME[lang];
-  const fontClass = lang === "zh" ? "font-tc" : "";
 
   return (
     <div className="flex min-h-screen flex-col items-center">
@@ -52,41 +51,29 @@ export default async function Home() {
           </span>
         </div>
         <nav className="flex items-center gap-6">
-          <Link
-            href="/listings"
-            className={`text-sm font-bold text-foreground ${fontClass}`}
-          >
-            {t.classifieds}
+          <Link href="/listings" className="text-sm font-bold text-foreground">
+            <Bi en="Classifieds" zh="分類廣告" />
           </Link>
-          <Link
-            href="#best-eats"
-            className={`text-sm font-bold text-foreground ${fontClass}`}
-          >
-            {t.bestEats}
+          <Link href="#best-eats" className="text-sm font-bold text-foreground">
+            <Bi en="Best Eats" zh="美食推薦" />
           </Link>
           {user ? (
             <form action="/auth/signout" method="post">
-              <button
-                type="submit"
-                className={`text-sm font-bold text-foreground ${fontClass}`}
-              >
-                {t.signOut}
+              <button type="submit" className="text-sm font-bold text-foreground">
+                <Bi en="Sign out" zh="登出" />
               </button>
             </form>
           ) : (
-            <Link
-              href="/login"
-              className={`text-sm font-bold text-foreground ${fontClass}`}
-            >
-              {t.signIn}
+            <Link href="/login" className="text-sm font-bold text-foreground">
+              <Bi en="Sign in" zh="登入" />
             </Link>
           )}
           <LanguageToggle current={lang} />
           <Link
             href="/post"
-            className={`rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)] ${fontClass}`}
+            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
           >
-            {t.post}
+            <Bi en="Post a listing" zh="張貼廣告" />
           </Link>
         </nav>
       </header>
@@ -103,39 +90,32 @@ export default async function Home() {
         <form className="mt-8 flex w-full max-w-xl gap-2">
           <input
             type="text"
-            placeholder={t.searchPlaceholder}
-            className={`flex-1 rounded-full border border-border bg-surface px-5 py-3 text-foreground shadow-[var(--shadow-card)] ${fontClass}`}
+            placeholder="Search listings, restaurants, neighborhoods / 搜尋分類廣告、餐廳、社區"
+            className="flex-1 rounded-full border border-border bg-surface px-5 py-3 text-foreground shadow-[var(--shadow-card)]"
           />
           <button
             type="submit"
-            className={`rounded-full bg-foreground px-6 py-3 text-sm font-bold text-white ${fontClass}`}
+            className="rounded-full bg-foreground px-6 py-3 text-sm font-bold text-white"
           >
-            {t.search}
+            <Bi en="Search" zh="搜尋" />
           </button>
         </form>
       </div>
 
       <div className="w-full max-w-6xl px-8 pb-16">
         <div className="mb-4 flex items-baseline justify-between">
-          <h2 className={`text-2xl font-extrabold text-foreground ${fontClass}`}>
-            {t.latest}
+          <h2 className="text-2xl font-extrabold text-foreground">
+            <Bi en="Latest listings" zh="最新刊登" />
           </h2>
-          <Link
-            href="/listings"
-            className={`text-sm font-bold text-coral hover:underline ${fontClass}`}
-          >
-            {t.seeAll}
+          <Link href="/listings" className="text-sm font-bold text-coral hover:underline">
+            <Bi en="See all" zh="查看全部" />
           </Link>
         </div>
         <ListingsBrowser listings={listings ?? []} />
       </div>
 
       <div id="best-eats" className="flex w-full scroll-mt-6 justify-center">
-        <BestEatsSection
-          reviews={reviews}
-          heading={t.bestEats}
-          fontClass={fontClass}
-        />
+        <BestEatsSection reviews={reviews} />
       </div>
     </div>
   );

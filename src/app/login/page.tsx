@@ -1,6 +1,7 @@
 import { login, signup } from "./actions";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { SubmitButton } from "@/components/SubmitButton";
+import { Bi } from "@/components/LanguageProvider";
 
 export default async function LoginPage({
   searchParams,
@@ -13,14 +14,14 @@ export default async function LoginPage({
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-16">
       <div className="w-full max-w-sm rounded-2xl bg-surface p-8 shadow-[var(--shadow-card)]">
         <h1 className="mb-6 text-2xl font-extrabold text-foreground">
-          Sign in to 123or4
+          <Bi en="Sign in to 123or4" zh="登入 123or4" />
         </h1>
 
         <GoogleSignInButton />
 
         <div className="my-5 flex items-center gap-4 text-sm text-text-secondary">
           <div className="h-px flex-1 bg-border" />
-          or
+          <Bi en="or" zh="或" />
           <div className="h-px flex-1 bg-border" />
         </div>
 
@@ -28,14 +29,14 @@ export default async function LoginPage({
           <input
             name="email"
             type="email"
-            placeholder="Email"
+            placeholder="Email / 電子郵件"
             required
             className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
           />
           <input
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Password / 密碼"
             required
             minLength={6}
             className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
@@ -45,17 +46,17 @@ export default async function LoginPage({
           <div className="flex gap-3">
             <SubmitButton
               formAction={login}
-              pendingLabel="Signing in..."
+              pendingLabel="Signing in... / 登入中..."
               className="flex-1 rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
             >
-              Sign in
+              <Bi en="Sign in" zh="登入" />
             </SubmitButton>
             <SubmitButton
               formAction={signup}
-              pendingLabel="Signing up..."
+              pendingLabel="Signing up... / 註冊中..."
               className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
             >
-              Sign up
+              <Bi en="Sign up" zh="註冊" />
             </SubmitButton>
           </div>
         </form>

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
+import { Bi } from "@/components/LanguageProvider";
 
 type Listing = {
   id: string;
@@ -23,12 +24,12 @@ type Listing = {
 };
 
 const CATEGORIES = [
-  { value: "all", label: "All", bg: "bg-foreground" },
-  { value: "hiring", label: "Hiring", bg: "bg-cat-hiring" },
-  { value: "rentals", label: "Rentals", bg: "bg-cat-rentals" },
-  { value: "homes", label: "Homes", bg: "bg-cat-homes" },
-  { value: "cars", label: "Cars", bg: "bg-cat-cars" },
-  { value: "services", label: "Services", bg: "bg-cat-services" },
+  { value: "all", en: "All", zh: "全部", bg: "bg-foreground" },
+  { value: "hiring", en: "Hiring", zh: "徵才", bg: "bg-cat-hiring" },
+  { value: "rentals", en: "Rentals", zh: "租屋", bg: "bg-cat-rentals" },
+  { value: "homes", en: "Homes", zh: "房屋", bg: "bg-cat-homes" },
+  { value: "cars", en: "Cars", zh: "汽車", bg: "bg-cat-cars" },
+  { value: "services", en: "Services", zh: "服務", bg: "bg-cat-services" },
 ];
 
 const CATEGORY_TEXT: Record<string, string> = {
@@ -50,6 +51,7 @@ function relativeTime(iso: string) {
 }
 
 function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
+  const cat = CATEGORIES.find((c) => c.value === listing.category);
   return (
     <div
       style={{ animationDelay: `${delay}ms` }}
@@ -65,7 +67,7 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         <span
           className={`w-fit rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
         >
-          {listing.category}
+          {cat ? <Bi en={cat.en} zh={cat.zh} /> : listing.category}
         </span>
         {listing.title_en && (
           <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
@@ -81,7 +83,10 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
           <p className="text-lg font-extrabold text-foreground">
             ${listing.price.toLocaleString()}
             {listing.category === "rentals" && (
-              <span className="text-sm font-bold text-text-secondary"> /mo</span>
+              <span className="text-sm font-bold text-text-secondary">
+                {" "}
+                /<Bi en="mo" zh="月" />
+              </span>
             )}
           </p>
         )}
@@ -93,7 +98,7 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         <div className="flex items-center gap-2 text-xs text-text-secondary">
           {listing.verified && (
             <span className="rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase text-white">
-              Verified
+              <Bi en="Verified" zh="已驗證" />
             </span>
           )}
           <span>
@@ -136,7 +141,7 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
                 : "bg-surface text-foreground shadow-[var(--shadow-card)] hover:bg-surface-muted"
             }`}
           >
-            {c.label}
+            <Bi en={c.en} zh={c.zh} />
           </button>
         ))}
       </div>
@@ -144,7 +149,10 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {filtered.length === 0 && (
           <p className="text-text-secondary">
-            No listings in this category yet — be the first to post.
+            <Bi
+              en="No listings in this category yet — be the first to post."
+              zh="此分類尚無刊登——成為第一個張貼的人。"
+            />
           </p>
         )}
         {filtered.map((listing, i) => (

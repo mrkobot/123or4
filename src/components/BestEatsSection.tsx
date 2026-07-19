@@ -4,13 +4,8 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
-
-const RATING_LABELS: Record<number, string> = {
-  1: "Meh",
-  2: "Average",
-  3: "Good",
-  4: "Excellent",
-};
+import { RATING_LABELS } from "@/utils/ratings";
+import { Bi } from "@/components/LanguageProvider";
 
 type Review = {
   id: string;
@@ -33,15 +28,7 @@ function locationOf(address: string | null) {
   return address?.split(",")[0]?.trim() ?? "Phoenix";
 }
 
-export function BestEatsSection({
-  reviews,
-  heading,
-  fontClass,
-}: {
-  reviews: Review[];
-  heading: string;
-  fontClass: string;
-}) {
+export function BestEatsSection({ reviews }: { reviews: Review[] }) {
   const [location, setLocation] = useState("all");
   const [query, setQuery] = useState("");
 
@@ -71,14 +58,14 @@ export function BestEatsSection({
   return (
     <div className="w-full max-w-6xl px-8 pb-16">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 className={`text-2xl font-extrabold text-foreground ${fontClass}`}>
-          {heading}
+        <h2 className="text-2xl font-extrabold text-foreground">
+          <Bi en="Best Eats" zh="美食推薦" />
         </h2>
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search cuisine, dish, restaurant"
+          placeholder="Search cuisine, dish, restaurant / 搜尋菜系、餐點、餐廳"
           className="w-full max-w-xs rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground shadow-[var(--shadow-card)]"
         />
       </div>
@@ -92,7 +79,7 @@ export function BestEatsSection({
               : "bg-surface text-foreground shadow-[var(--shadow-card)] hover:bg-surface-muted"
           }`}
         >
-          All areas
+          <Bi en="All areas" zh="全部地區" />
         </button>
         {locations.map((loc) => (
           <button
@@ -121,7 +108,7 @@ export function BestEatsSection({
           )}
           <div className="flex-1 p-6">
             <span className="text-xs font-bold uppercase tracking-wide text-cat-eats">
-              This week&rsquo;s pick
+              <Bi en="This week's pick" zh="本週精選" />
             </span>
             <h3 className="mt-1 text-2xl font-extrabold tracking-tight text-foreground">
               {featured.restaurant?.name_en}
@@ -134,18 +121,21 @@ export function BestEatsSection({
             </p>
             {featured.editor && (
               <p className="mt-2 text-xs font-bold text-text-secondary">
-                Reviewed by {featured.editor.name}
+                <Bi en="Reviewed by" zh="評論者" /> {featured.editor.name}
               </p>
             )}
 
             <div className="mt-4">
               <div className="text-[11px] font-bold uppercase tracking-wide text-text-secondary">
-                Editor
+                <Bi en="Editor" zh="編輯" />
               </div>
               <div className="text-2xl font-extrabold text-foreground">
                 {featured.editor_rating}{" "}
                 <span className="text-sm">
-                  {RATING_LABELS[featured.editor_rating]}
+                  <Bi
+                    en={RATING_LABELS[featured.editor_rating].en}
+                    zh={RATING_LABELS[featured.editor_rating].zh}
+                  />
                 </span>
               </div>
             </div>
@@ -165,7 +155,9 @@ export function BestEatsSection({
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {rest.length === 0 && filtered.length === 0 && (
-          <p className="text-text-secondary">No restaurants match that search.</p>
+          <p className="text-text-secondary">
+            <Bi en="No restaurants match that search." zh="沒有符合搜尋條件的餐廳。" />
+          </p>
         )}
         {rest.map((review) => (
           <div
@@ -190,7 +182,10 @@ export function BestEatsSection({
               <div className="mt-1 text-sm font-extrabold text-foreground">
                 {review.editor_rating}{" "}
                 <span className="text-xs font-bold">
-                  {RATING_LABELS[review.editor_rating]}
+                  <Bi
+                    en={RATING_LABELS[review.editor_rating].en}
+                    zh={RATING_LABELS[review.editor_rating].zh}
+                  />
                 </span>
               </div>
             </div>
