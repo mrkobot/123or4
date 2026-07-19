@@ -1,80 +1,105 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
+import { ListingsBrowser } from "@/components/ListingsBrowser";
 
-const CATEGORIES = [
-  { label: "Hiring", className: "text-cat-hiring" },
-  { label: "Rentals", className: "text-cat-rentals" },
-  { label: "Homes", className: "text-cat-homes" },
-  { label: "Cars", className: "text-cat-cars" },
-  { label: "Services", className: "text-cat-services" },
-  { label: "Best Eats", className: "text-cat-eats" },
-];
+const LISTING_FIELDS =
+  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
 
 export default async function Home() {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+  const { data: listings } = await supabase
+    .from("listings")
+    .select(LISTING_FIELDS)
+    .eq("status", "active")
+    .order("created_at", { ascending: false })
+    .limit(9);
 
   return (
-    <div className="flex min-h-screen flex-col items-center gap-10 p-16">
-      <div className="flex w-full max-w-2xl items-center justify-between">
-        <div className="text-2xl font-extrabold text-foreground">123or4</div>
-        {user ? (
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-text-secondary">{user.email}</span>
+    <div className="flex min-h-screen flex-col items-center">
+      <header className="flex w-full max-w-6xl items-center justify-between px-8 py-6">
+        <div className="flex items-baseline gap-2">
+          <span className="text-2xl font-extrabold text-foreground">
+            123or4.
+          </span>
+          <span className="text-sm text-text-secondary">
+            <span className="font-tc">鳳凰城</span> · Phoenix
+          </span>
+        </div>
+        <nav className="flex items-center gap-6">
+          <Link href="/listings" className="text-sm font-bold text-foreground">
+            Classifieds
+          </Link>
+          <span className="text-sm font-bold text-foreground/40">
+            Best Eats
+          </span>
+          {user ? (
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
-                className="rounded-full border border-border px-4 py-2 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
+                className="text-sm font-bold text-foreground"
               >
                 Sign out
               </button>
             </form>
+          ) : (
+            <Link href="/login" className="text-sm font-bold text-foreground">
+              Sign in
+            </Link>
+          )}
+          <div className="flex overflow-hidden rounded-full bg-foreground text-xs font-bold text-white">
+            <span className="bg-foreground px-3 py-2">EN</span>
+            <span className="px-3 py-2 font-tc text-white/50">中文</span>
           </div>
-        ) : (
-          <Link
-            href="/login"
-            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
-          >
-            Sign in
-          </Link>
-        )}
-      </div>
-
-      <div className="flex w-full max-w-2xl flex-col gap-6 rounded-2xl bg-surface p-10 shadow-[var(--shadow-card)]">
-        <div>
-          <p className="text-sm font-bold text-coral">
-            Classifieds and Best Eats for Chinese Americans in Phoenix{" "}
-            <span className="font-tc">鳳凰城美國華人分類廣告與美食</span>
-          </p>
-          <h1 className="mt-2 text-4xl font-extrabold leading-tight tracking-tight text-foreground">
-            The community&rsquo;s classifieds, and the best eats in town.
-          </h1>
-        </div>
-
-        <div className="flex flex-wrap gap-x-6 gap-y-2">
-          {CATEGORIES.map((c) => (
-            <span key={c.label} className={`text-sm font-bold ${c.className}`}>
-              {c.label}
-            </span>
-          ))}
-        </div>
-
-        <div className="flex gap-3">
-          <Link
-            href="/listings"
-            className="rounded-full bg-coral px-6 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
-          >
-            Browse classifieds
-          </Link>
           <Link
             href="/post"
-            className="rounded-full border border-border px-6 py-3 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
+            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
           >
             Post a listing
           </Link>
+        </nav>
+      </header>
+
+      <div className="w-full max-w-6xl px-8 py-8">
+        <h1 className="text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
+          The community&rsquo;s <span className="text-coral">classifieds</span>,
+          <br />
+          and the <span className="text-coral">best eats</span> in town.
+        </h1>
+        <p className="font-tc mt-4 text-lg text-text-secondary">
+          社區的分類廣告，與城裡最棒的美食。
+        </p>
+
+        <form className="mt-8 flex w-full max-w-xl gap-2">
+          <input
+            type="text"
+            placeholder="Search listings, restaurants, neighborhoods"
+            className="flex-1 rounded-full border border-border bg-surface px-5 py-3 text-foreground shadow-[var(--shadow-card)]"
+          />
+          <button
+            type="submit"
+            className="rounded-full bg-foreground px-6 py-3 text-sm font-bold text-white"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      <div className="w-full max-w-6xl px-8 pb-16">
+        <div className="mb-4 flex items-baseline justify-between">
+          <h2 className="text-2xl font-extrabold text-foreground">
+            Latest listings
+          </h2>
+          <Link
+            href="/listings"
+            className="text-sm font-bold text-coral hover:underline"
+          >
+            See all
+          </Link>
         </div>
+        <ListingsBrowser listings={listings ?? []} />
       </div>
     </div>
   );

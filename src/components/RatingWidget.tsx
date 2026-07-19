@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
 
@@ -23,8 +23,32 @@ export function RatingWidget({
   voteCount: number;
 }) {
   const [pending, setPending] = useState(false);
+  const [myRating, setMyRating] = useState<number | null>(null);
   const router = useRouter();
   const supabase = createClient();
+
+  useEffect(() => {
+    let cancelled = false;
+    async function loadMyRating() {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return;
+      const { data } = await supabase
+        .from("ratings")
+        .select("value")
+        .eq("item_type", itemType)
+        .eq("item_id", itemId)
+        .eq("user_id", user.id)
+        .maybeSingle();
+      if (!cancelled && data) setMyRating(data.value);
+    }
+    loadMyRating();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [itemType, itemId]);
 
   async function rate(value: number) {
     setPending(true);
@@ -42,32 +66,42 @@ export function RatingWidget({
       p_item_id: itemId,
       p_value: value,
     });
+    setMyRating(value);
     setPending(false);
     router.refresh();
   }
 
   return (
-    <div className="mt-1 flex items-center gap-4">
-      <div className="flex gap-1.5">
-        {[1, 2, 3, 4].map((value) => (
-          <button
-            key={value}
-            type="button"
-            disabled={pending}
-            onClick={() => rate(value)}
-            title={RATING_LABELS[value]}
-            className="h-8 w-8 rounded-full bg-surface-muted text-sm font-bold text-foreground transition-all hover:bg-coral hover:text-white disabled:opacity-50"
-          >
-            {value}
-          </button>
-        ))}
+    <div className="mt-2 flex flex-col gap-2">
+      <div className="grid grid-cols-4 gap-2">
+        {[1, 2, 3, 4].map((value) => {
+          const selected = myRating === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              disabled={pending}
+              onClick={() => rate(value)}
+              className={`flex flex-col items-center rounded-xl py-2.5 transition-all disabled:opacity-50 ${
+                selected
+                  ? "bg-coral text-white"
+                  : "bg-surface-muted text-foreground hover:bg-coral/15"
+              }`}
+            >
+              <span className="text-xl font-extrabold leading-none">
+                {value}
+              </span>
+              <span className="mt-0.5 text-[11px] font-bold leading-none">
+                {RATING_LABELS[value]}
+              </span>
+            </button>
+          );
+        })}
       </div>
       {communityRating != null ? (
-        <span className="flex items-baseline gap-1.5 font-extrabold text-coral">
-          <span className="text-xl">{Math.round(communityRating)}</span>
-          <span className="text-xs font-bold">
-            {RATING_LABELS[Math.round(communityRating)]} · {voteCount} votes
-          </span>
+        <span className="text-xs font-bold text-text-secondary">
+          Community: {Math.round(communityRating)}{" "}
+          {RATING_LABELS[Math.round(communityRating)]} · {voteCount} votes
         </span>
       ) : (
         <span className="text-xs font-bold text-text-secondary">

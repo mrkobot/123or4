@@ -2,19 +2,20 @@ import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { ListingsBrowser } from "@/components/ListingsBrowser";
 
+const LISTING_FIELDS =
+  "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
+
 export default async function ListingsPage() {
   const supabase = await createClient();
   const { data: listings } = await supabase
     .from("listings")
-    .select(
-      "id, category, title_en, title_zh, body_en, body_zh, community_rating, vote_count",
-    )
+    .select(LISTING_FIELDS)
     .eq("status", "active")
     .order("created_at", { ascending: false });
 
   return (
     <div className="flex min-h-screen flex-col items-center gap-8 p-16">
-      <div className="flex w-full max-w-2xl items-center justify-between">
+      <div className="flex w-full max-w-6xl items-center justify-between">
         <h1 className="text-2xl font-extrabold text-foreground">
           Classifieds
         </h1>
@@ -26,7 +27,9 @@ export default async function ListingsPage() {
         </Link>
       </div>
 
-      <ListingsBrowser listings={listings ?? []} />
+      <div className="w-full max-w-6xl">
+        <ListingsBrowser listings={listings ?? []} />
+      </div>
     </div>
   );
 }
