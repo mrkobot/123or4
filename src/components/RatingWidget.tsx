@@ -12,7 +12,7 @@ const RATING_LABELS: Record<number, string> = {
 };
 
 const RATE_STYLES: Record<number, { bg: string; text: string }> = {
-  1: { bg: "bg-rate-1", text: "text-foreground" },
+  1: { bg: "bg-rate-1", text: "text-white" },
   2: { bg: "bg-rate-2", text: "text-foreground" },
   3: { bg: "bg-rate-3", text: "text-white" },
   4: { bg: "bg-rate-4", text: "text-white" },
