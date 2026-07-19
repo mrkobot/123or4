@@ -6,6 +6,7 @@ import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
 import { Bi, TitlePair } from "@/components/LanguageProvider";
 import { RATE_HEX } from "@/utils/ratings";
+import { EditorShieldBadge, CommunityPill } from "@/components/ScoreBadges";
 
 type Listing = {
   id: string;
@@ -20,6 +21,7 @@ type Listing = {
   created_at: string;
   community_rating: number | null;
   vote_count: number;
+  staff_rating: number | null;
   photos: string[] | null;
   city: { name: string }[] | null;
 };
@@ -76,11 +78,22 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
       )}
 
       <div className="flex flex-col gap-2 p-6">
-        <span
-          className={`w-fit rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
-        >
-          {cat ? <Bi en={cat.en} zh={cat.zh} /> : listing.category}
-        </span>
+        <div className="flex items-start justify-between gap-3">
+          <span
+            className={`w-fit rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
+          >
+            {cat ? <Bi en={cat.en} zh={cat.zh} /> : listing.category}
+          </span>
+          <div className="flex shrink-0 flex-col items-end gap-1.5">
+            {listing.staff_rating != null && (
+              <EditorShieldBadge value={listing.staff_rating} />
+            )}
+            <CommunityPill
+              rating={listing.community_rating}
+              voteCount={listing.vote_count}
+            />
+          </div>
+        </div>
         <TitlePair
           en={listing.title_en}
           zh={listing.title_zh}
@@ -117,8 +130,6 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         <RatingWidget
           itemType="listing"
           itemId={listing.id}
-          communityRating={listing.community_rating}
-          voteCount={listing.vote_count}
           onVote={handleVote}
         />
       </div>

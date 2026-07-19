@@ -4,9 +4,9 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
-import { RATING_LABELS } from "@/utils/ratings";
 import { Bi, TitlePair } from "@/components/LanguageProvider";
 import { RATE_HEX } from "@/utils/ratings";
+import { EditorPill, CommunityPill } from "@/components/ScoreBadges";
 
 type Review = {
   id: string;
@@ -122,9 +122,18 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
             <PlaceholderPhoto category="eats" className="h-56 md:h-auto md:w-2/5" />
           )}
           <div className="flex-1 p-6">
-            <span className="text-xs font-bold uppercase tracking-wide text-cat-eats">
-              <Bi en="This week's pick" zh="本週精選" />
-            </span>
+            <div className="flex items-start justify-between gap-3">
+              <span className="text-xs font-bold uppercase tracking-wide text-cat-eats">
+                <Bi en="This week's pick" zh="本週精選" />
+              </span>
+              <div className="flex shrink-0 gap-1.5">
+                <EditorPill value={featured.editor_rating} />
+                <CommunityPill
+                  rating={featured.community_rating}
+                  voteCount={featured.vote_count}
+                />
+              </div>
+            </div>
             <TitlePair
               en={featured.restaurant?.name_en}
               zh={featured.restaurant?.name_zh}
@@ -144,29 +153,12 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
               </p>
             )}
 
-            <div className="mt-4">
-              <div className="text-[11px] font-bold uppercase tracking-wide text-text-secondary">
-                <Bi en="Editor" zh="編輯" />
-              </div>
-              <div className="text-2xl font-extrabold text-foreground">
-                {featured.editor_rating}{" "}
-                <span className="text-sm">
-                  <Bi
-                    en={RATING_LABELS[featured.editor_rating].en}
-                    zh={RATING_LABELS[featured.editor_rating].zh}
-                  />
-                </span>
-              </div>
-            </div>
-
             <p className="mt-4 text-foreground/80">{featured.body_en}</p>
             <p className="font-tc mt-2 text-foreground/80">{featured.body_zh}</p>
 
             <RatingWidget
               itemType="review"
               itemId={featured.id}
-              communityRating={featured.community_rating}
-              voteCount={featured.vote_count}
               onVote={handleVote}
             />
           </div>
@@ -190,27 +182,27 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
               <PlaceholderPhoto category="eats" />
             )}
             <div className="flex flex-col gap-1 p-5">
-              <TitlePair
-                en={review.restaurant?.name_en}
-                zh={review.restaurant?.name_zh}
-                headClassName="text-lg font-extrabold tracking-tight text-foreground"
-                subClassName="text-xs font-bold text-text-secondary"
-              />
+              <div className="flex items-start justify-between gap-2">
+                <TitlePair
+                  en={review.restaurant?.name_en}
+                  zh={review.restaurant?.name_zh}
+                  headClassName="text-lg font-extrabold tracking-tight text-foreground"
+                  subClassName="text-xs font-bold text-text-secondary"
+                />
+                <div className="flex shrink-0 gap-1">
+                  <EditorPill value={review.editor_rating} />
+                  <CommunityPill
+                    rating={review.community_rating}
+                    voteCount={review.vote_count}
+                  />
+                </div>
+              </div>
               <p className="text-xs text-text-secondary">
                 <Bi
                   en={review.restaurant?.cuisine_en ?? ""}
                   zh={review.restaurant?.cuisine_zh ?? ""}
                 />
               </p>
-              <div className="mt-1 text-sm font-extrabold text-foreground">
-                {review.editor_rating}{" "}
-                <span className="text-xs font-bold">
-                  <Bi
-                    en={RATING_LABELS[review.editor_rating].en}
-                    zh={RATING_LABELS[review.editor_rating].zh}
-                  />
-                </span>
-              </div>
             </div>
           </div>
         ))}
