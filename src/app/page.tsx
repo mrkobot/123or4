@@ -66,7 +66,7 @@ export default async function Home() {
         <h1 className="font-tc text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
           本市的<span className="text-coral">分類廣告</span>與<span className="text-coral">最佳美食</span>
         </h1>
-        <h1 className="mt-3 text-3xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-4xl">
+        <h1 className="mt-3 text-2xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-3xl">
           Our city&rsquo;s <span className="text-coral">classifieds</span> and
           the <span className="text-coral">best eats</span>
         </h1>
