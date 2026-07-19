@@ -11,6 +11,13 @@ const RATING_LABELS: Record<number, string> = {
   4: "Excellent",
 };
 
+const RATE_STYLES: Record<number, { bg: string; text: string }> = {
+  1: { bg: "bg-rate-1", text: "text-foreground" },
+  2: { bg: "bg-rate-2", text: "text-foreground" },
+  3: { bg: "bg-rate-3", text: "text-white" },
+  4: { bg: "bg-rate-4", text: "text-white" },
+};
+
 export function RatingWidget({
   itemType,
   itemId,
@@ -51,6 +58,7 @@ export function RatingWidget({
   }, [itemType, itemId]);
 
   async function rate(value: number) {
+    if (myRating != null) return;
     setPending(true);
     const {
       data: { user },
@@ -73,20 +81,26 @@ export function RatingWidget({
 
   return (
     <div className="mt-2 flex flex-col gap-2">
-      <div className="grid grid-cols-4 gap-2">
-        {[1, 2, 3, 4].map((value) => {
-          const selected = myRating === value;
-          return (
+      {myRating != null ? (
+        <div
+          className={`flex w-fit items-center gap-2 rounded-xl px-4 py-2 ${RATE_STYLES[myRating].bg} ${RATE_STYLES[myRating].text}`}
+        >
+          <span className="text-xl font-extrabold leading-none">
+            {myRating}
+          </span>
+          <span className="text-xs font-bold">
+            You rated this {RATING_LABELS[myRating]}
+          </span>
+        </div>
+      ) : (
+        <div className="grid grid-cols-4 gap-2">
+          {[1, 2, 3, 4].map((value) => (
             <button
               key={value}
               type="button"
               disabled={pending}
               onClick={() => rate(value)}
-              className={`flex flex-col items-center rounded-xl py-2.5 transition-all disabled:opacity-50 ${
-                selected
-                  ? "bg-coral text-white"
-                  : "bg-surface-muted text-foreground hover:bg-coral/15"
-              }`}
+              className={`flex flex-col items-center rounded-xl py-2.5 opacity-80 transition-all hover:opacity-100 disabled:opacity-50 ${RATE_STYLES[value].bg} ${RATE_STYLES[value].text}`}
             >
               <span className="text-xl font-extrabold leading-none">
                 {value}
@@ -95,9 +109,9 @@ export function RatingWidget({
                 {RATING_LABELS[value]}
               </span>
             </button>
-          );
-        })}
-      </div>
+          ))}
+        </div>
+      )}
       {communityRating != null ? (
         <span className="text-xs font-bold text-text-secondary">
           Community: {Math.round(communityRating)}{" "}

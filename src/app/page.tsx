@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { createClient } from "@/utils/supabase/server";
 import { ListingsBrowser } from "@/components/ListingsBrowser";
+import { LanguageToggle } from "@/components/LanguageToggle";
+import { getLanguage, CHROME } from "@/utils/language";
 
 const LISTING_FIELDS =
   "id, category, title_en, title_zh, body_en, body_zh, translation_source, price, verified, created_at, community_rating, vote_count, city:cities(name)";
@@ -17,6 +19,10 @@ export default async function Home() {
     .order("created_at", { ascending: false })
     .limit(9);
 
+  const lang = await getLanguage();
+  const t = CHROME[lang];
+  const fontClass = lang === "zh" ? "font-tc" : "";
+
   return (
     <div className="flex min-h-screen flex-col items-center">
       <header className="flex w-full max-w-6xl items-center justify-between px-8 py-6">
@@ -29,35 +35,38 @@ export default async function Home() {
           </span>
         </div>
         <nav className="flex items-center gap-6">
-          <Link href="/listings" className="text-sm font-bold text-foreground">
-            Classifieds
+          <Link
+            href="/listings"
+            className={`text-sm font-bold text-foreground ${fontClass}`}
+          >
+            {t.classifieds}
           </Link>
-          <span className="text-sm font-bold text-foreground/40">
-            Best Eats
+          <span className={`text-sm font-bold text-foreground/40 ${fontClass}`}>
+            {t.bestEats}
           </span>
           {user ? (
             <form action="/auth/signout" method="post">
               <button
                 type="submit"
-                className="text-sm font-bold text-foreground"
+                className={`text-sm font-bold text-foreground ${fontClass}`}
               >
-                Sign out
+                {t.signOut}
               </button>
             </form>
           ) : (
-            <Link href="/login" className="text-sm font-bold text-foreground">
-              Sign in
+            <Link
+              href="/login"
+              className={`text-sm font-bold text-foreground ${fontClass}`}
+            >
+              {t.signIn}
             </Link>
           )}
-          <div className="flex overflow-hidden rounded-full bg-foreground text-xs font-bold text-white">
-            <span className="bg-foreground px-3 py-2">EN</span>
-            <span className="px-3 py-2 font-tc text-white/50">中文</span>
-          </div>
+          <LanguageToggle current={lang} />
           <Link
             href="/post"
-            className="rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+            className={`rounded-full bg-coral px-5 py-2.5 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)] ${fontClass}`}
           >
-            Post a listing
+            {t.post}
           </Link>
         </nav>
       </header>
@@ -74,28 +83,28 @@ export default async function Home() {
         <form className="mt-8 flex w-full max-w-xl gap-2">
           <input
             type="text"
-            placeholder="Search listings, restaurants, neighborhoods"
-            className="flex-1 rounded-full border border-border bg-surface px-5 py-3 text-foreground shadow-[var(--shadow-card)]"
+            placeholder={t.searchPlaceholder}
+            className={`flex-1 rounded-full border border-border bg-surface px-5 py-3 text-foreground shadow-[var(--shadow-card)] ${fontClass}`}
           />
           <button
             type="submit"
-            className="rounded-full bg-foreground px-6 py-3 text-sm font-bold text-white"
+            className={`rounded-full bg-foreground px-6 py-3 text-sm font-bold text-white ${fontClass}`}
           >
-            Search
+            {t.search}
           </button>
         </form>
       </div>
 
       <div className="w-full max-w-6xl px-8 pb-16">
         <div className="mb-4 flex items-baseline justify-between">
-          <h2 className="text-2xl font-extrabold text-foreground">
-            Latest listings
+          <h2 className={`text-2xl font-extrabold text-foreground ${fontClass}`}>
+            {t.latest}
           </h2>
           <Link
             href="/listings"
-            className="text-sm font-bold text-coral hover:underline"
+            className={`text-sm font-bold text-coral hover:underline ${fontClass}`}
           >
-            See all
+            {t.seeAll}
           </Link>
         </div>
         <ListingsBrowser listings={listings ?? []} />

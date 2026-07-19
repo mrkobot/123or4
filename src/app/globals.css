@@ -15,6 +15,10 @@
   --cat-cars: #6b5b95;
   --cat-services: #2c8c8c;
   --cat-eats: #d9971f;
+  --rate-1: #f2c230;
+  --rate-2: #a9c23f;
+  --rate-3: #4fa97c;
+  --rate-4: #0f6e56;
   --shadow-card: 0 1px 2px rgba(20, 24, 31, 0.04), 0 8px 24px rgba(20, 24, 31, 0.06);
   --shadow-card-hover: 0 2px 4px rgba(20, 24, 31, 0.06), 0 16px 32px rgba(20, 24, 31, 0.1);
 }
@@ -34,6 +38,10 @@
   --color-cat-cars: var(--cat-cars);
   --color-cat-services: var(--cat-services);
   --color-cat-eats: var(--cat-eats);
+  --color-rate-1: var(--rate-1);
+  --color-rate-2: var(--rate-2);
+  --color-rate-3: var(--rate-3);
+  --color-rate-4: var(--rate-4);
   --font-sans: var(--font-jakarta);
   --font-tc: var(--font-noto-tc);
 }
