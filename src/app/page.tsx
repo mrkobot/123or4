@@ -68,9 +68,11 @@ export default async function Home() {
           <br />
           and the <span className="text-coral">best eats</span> in town.
         </h1>
-        <p className="font-tc mt-4 text-lg text-text-secondary">
-          社區的分類廣告，與城裡最棒的美食。
-        </p>
+        <h1 className="font-tc mt-3 text-5xl font-extrabold leading-[1.05] tracking-tight text-foreground sm:text-6xl">
+          社區的<span className="text-coral">分類廣告</span>，
+          <br />
+          與城裡最棒的<span className="text-coral">美食</span>。
+        </h1>
 
         <form className="mt-8 flex w-full max-w-xl gap-2">
           <input

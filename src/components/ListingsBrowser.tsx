@@ -47,13 +47,6 @@ function relativeTime(iso: string) {
 }
 
 function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
-  const hasBothLanguages = Boolean(listing.title_en && listing.title_zh);
-  const [showEnglish, setShowEnglish] = useState(listing.translation_source === "en");
-
-  const title = showEnglish ? listing.title_en : listing.title_zh;
-  const body = showEnglish ? listing.body_en : listing.body_zh;
-  const fontClass = showEnglish ? "" : "font-tc";
-
   return (
     <div
       style={{ animationDelay: `${delay}ms` }}
@@ -64,9 +57,16 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
       >
         {listing.category}
       </span>
-      <h2 className={`text-2xl font-extrabold tracking-tight text-foreground ${fontClass}`}>
-        {title}
-      </h2>
+      {listing.title_en && (
+        <h2 className="text-2xl font-extrabold tracking-tight text-foreground">
+          {listing.title_en}
+        </h2>
+      )}
+      {listing.title_zh && (
+        <h2 className="font-tc text-2xl font-extrabold tracking-tight text-foreground">
+          {listing.title_zh}
+        </h2>
+      )}
       {listing.price != null && (
         <p className="text-lg font-extrabold text-foreground">
           ${listing.price.toLocaleString()}
@@ -75,7 +75,10 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
           )}
         </p>
       )}
-      <p className={`text-foreground/80 ${fontClass}`}>{body}</p>
+      {listing.body_en && <p className="text-foreground/80">{listing.body_en}</p>}
+      {listing.body_zh && (
+        <p className="font-tc text-foreground/80">{listing.body_zh}</p>
+      )}
 
       <div className="flex items-center gap-2 text-xs text-text-secondary">
         {listing.verified && (
@@ -87,16 +90,6 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
           {listing.city?.[0]?.name ?? "Phoenix"} · {relativeTime(listing.created_at)}
         </span>
       </div>
-
-      {hasBothLanguages && (
-        <button
-          type="button"
-          onClick={() => setShowEnglish((v) => !v)}
-          className="w-fit text-xs font-bold text-coral hover:underline"
-        >
-          {showEnglish ? "顯示中文" : "Show in English"}
-        </button>
-      )}
 
       <RatingWidget
         itemType="listing"
