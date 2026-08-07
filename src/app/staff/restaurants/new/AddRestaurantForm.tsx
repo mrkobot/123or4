@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { createClient } from "@/utils/supabase/client";
 import { SubmitButton } from "@/components/SubmitButton";
+import { PhotoDropzone } from "@/components/PhotoDropzone";
 import { addRestaurant } from "./actions";
 
 export function AddRestaurantForm({
@@ -13,26 +13,6 @@ export function AddRestaurantForm({
   error?: string;
 }) {
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const supabase = createClient();
-
-  async function handleFiles(files: FileList | null) {
-    if (!files || files.length === 0) return;
-    setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
-      const path = `restaurants/${crypto.randomUUID()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("photos")
-        .upload(path, file);
-      if (!uploadError) {
-        const { data } = supabase.storage.from("photos").getPublicUrl(path);
-        uploaded.push(data.publicUrl);
-      }
-    }
-    setPhotoUrls((prev) => [...prev, ...uploaded]);
-    setUploading(false);
-  }
 
   const inputClass =
     "rounded-lg border border-border bg-surface px-4 py-3 text-foreground";
@@ -70,25 +50,14 @@ export function AddRestaurantForm({
         Verified
       </label>
 
-      <label className={`${labelClass} sm:col-span-2`}>
+      <div className={`${labelClass} sm:col-span-2`}>
         Photos
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => handleFiles(e.target.files)}
-          className="text-sm text-foreground"
+        <PhotoDropzone
+          photoUrls={photoUrls}
+          onChange={setPhotoUrls}
+          pathPrefix="restaurants"
         />
-      </label>
-      {uploading && <p className="text-xs font-bold text-text-secondary sm:col-span-2">Uploading...</p>}
-      {photoUrls.length > 0 && (
-        <div className="flex flex-wrap gap-2 sm:col-span-2">
-          {photoUrls.map((url) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img key={url} src={url} alt="" className="h-16 w-16 rounded-lg object-cover" />
-          ))}
-        </div>
-      )}
+      </div>
       <input type="hidden" name="photos" value={JSON.stringify(photoUrls)} />
 
       <div className="sm:col-span-2 h-px bg-border" />

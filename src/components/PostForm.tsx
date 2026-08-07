@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
-import { createClient } from "@/utils/supabase/client";
+import { PhotoDropzone } from "@/components/PhotoDropzone";
 import { Bi } from "@/components/LanguageProvider";
 
 const CATEGORIES = [
@@ -53,31 +53,11 @@ export function PostForm({
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [photoUrls, setPhotoUrls] = useState<string[]>([]);
-  const [uploading, setUploading] = useState(false);
-  const supabase = createClient();
 
   const titlePreview = useDebouncedTranslation(title, language);
   const bodyPreview = useDebouncedTranslation(body, language);
 
   const previewFontClass = language === "en" ? "font-tc" : "";
-
-  async function handleFiles(files: FileList | null) {
-    if (!files || files.length === 0) return;
-    setUploading(true);
-    const uploaded: string[] = [];
-    for (const file of Array.from(files)) {
-      const path = `listings/${crypto.randomUUID()}-${file.name}`;
-      const { error: uploadError } = await supabase.storage
-        .from("photos")
-        .upload(path, file);
-      if (!uploadError) {
-        const { data } = supabase.storage.from("photos").getPublicUrl(path);
-        uploaded.push(data.publicUrl);
-      }
-    }
-    setPhotoUrls((prev) => [...prev, ...uploaded]);
-    setUploading(false);
-  }
 
   return (
     <form className="flex flex-col gap-3">
@@ -129,34 +109,17 @@ export function PostForm({
         className={`rounded-lg border border-border bg-surface px-4 py-3 text-foreground ${language === "zh" ? "font-tc" : ""}`}
       />
 
-      <label className="text-sm font-bold text-text-secondary">
-        <Bi en="Photos" zh="照片" />
-        <input
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => handleFiles(e.target.files)}
-          className="mt-1 block w-full text-sm text-foreground"
+      <div className="flex flex-col gap-1">
+        <span className="text-sm font-bold text-text-secondary">
+          <Bi en="Photos" zh="照片" />
+        </span>
+        <PhotoDropzone
+          photoUrls={photoUrls}
+          onChange={setPhotoUrls}
+          pathPrefix="listings"
+          bilingual
         />
-      </label>
-      {uploading && (
-        <p className="text-xs font-bold text-text-secondary">
-          <Bi en="Uploading..." zh="上傳中..." />
-        </p>
-      )}
-      {photoUrls.length > 0 && (
-        <div className="flex flex-wrap gap-2">
-          {photoUrls.map((url) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              key={url}
-              src={url}
-              alt=""
-              className="h-16 w-16 rounded-lg object-cover"
-            />
-          ))}
-        </div>
-      )}
+      </div>
       <input type="hidden" name="photos" value={JSON.stringify(photoUrls)} />
 
       {(title || body) && (
