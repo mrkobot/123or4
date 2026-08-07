@@ -69,7 +69,7 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         borderColor: flashRate ? RATE_HEX[flashRate] : undefined,
         transition: "border-color 400ms ease",
       }}
-      className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
+      className="animate-fade-in-up flex flex-col overflow-hidden rounded-2xl border-2 border-transparent bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
     >
       {listing.photos && listing.photos.length > 0 ? (
         <PhotoCarousel photos={listing.photos} />

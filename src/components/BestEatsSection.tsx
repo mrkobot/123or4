@@ -111,7 +111,7 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
             borderColor: flashRate ? RATE_HEX[flashRate] : undefined,
             transition: "border-color 400ms ease",
           }}
-          className="mb-4 flex flex-col gap-0 overflow-hidden rounded-2xl border-2 border-border bg-surface shadow-[var(--shadow-card)] md:flex-row"
+          className="mb-4 flex flex-col gap-0 overflow-hidden rounded-2xl border-2 border-transparent bg-surface shadow-[var(--shadow-card)] md:flex-row"
         >
           {featured.restaurant?.photos && featured.restaurant.photos.length > 0 ? (
             <PhotoCarousel
@@ -174,7 +174,7 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
         {rest.map((review) => (
           <div
             key={review.id}
-            className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-[var(--shadow-card)]"
+            className="flex flex-col overflow-hidden rounded-2xl bg-surface shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
           >
             {review.restaurant?.photos && review.restaurant.photos.length > 0 ? (
               <PhotoCarousel photos={review.restaurant.photos} />
