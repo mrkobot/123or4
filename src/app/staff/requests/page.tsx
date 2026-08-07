@@ -1,18 +1,27 @@
+import Link from "next/link";
 import { requireStaff } from "@/utils/staff";
-import { approveRequest, declineRequest } from "./actions";
+import { approveRequest, declineRequest, convertRequestToListing } from "./actions";
 
-export default async function StaffRequestsPage() {
+export default async function StaffRequestsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { error } = await searchParams;
   const { supabase } = await requireStaff();
 
   const { data: requests } = await supabase
     .from("client_requests")
-    .select("id, business_name, contact_name, contact_email, contact_phone, requested_action, status, decline_reason, created_at")
+    .select(
+      "id, business_name, contact_name, contact_email, contact_phone, requested_action, status, decline_reason, converted_listing_id, created_at",
+    )
     .order("created_at", { ascending: false })
     .limit(50);
 
   return (
     <div className="flex flex-col gap-4">
       <h1 className="text-2xl font-extrabold text-foreground">Client requests</h1>
+      {error && <p className="text-sm text-coral-deep">{error}</p>}
       {requests?.length === 0 && (
         <p className="text-sm text-text-secondary">No requests yet.</p>
       )}
@@ -32,15 +41,31 @@ export default async function StaffRequestsPage() {
               {r.decline_reason && (
                 <p className="text-xs text-coral-deep">Declined: {r.decline_reason}</p>
               )}
+              {r.converted_listing_id && (
+                <p className="text-xs text-cat-homes">
+                  Converted to a draft listing —{" "}
+                  <Link href="/staff/listings" className="underline">
+                    edit it
+                  </Link>
+                </p>
+              )}
             </div>
             {r.status === "pending" && (
               <div className="flex shrink-0 gap-2">
                 <form action={approveRequest.bind(null, r.id)}>
                   <button
                     type="submit"
-                    className="rounded-full bg-cat-homes px-3 py-1.5 text-xs font-bold text-white"
+                    className="rounded-full border border-border px-3 py-1.5 text-xs font-bold text-foreground hover:bg-surface-muted"
                   >
                     Approve
+                  </button>
+                </form>
+                <form action={convertRequestToListing.bind(null, r.id)}>
+                  <button
+                    type="submit"
+                    className="rounded-full bg-cat-homes px-3 py-1.5 text-xs font-bold text-white"
+                  >
+                    Convert to listing draft
                   </button>
                 </form>
                 <details className="relative">

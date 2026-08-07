@@ -6,6 +6,7 @@ const NAV = [
   { href: "/staff/restaurants/new", label: "Add restaurant" },
   { href: "/staff/restaurants/import", label: "Batch import" },
   { href: "/staff/listings", label: "Listings" },
+  { href: "/staff/reviews", label: "Reviews" },
   { href: "/staff/requests", label: "Client requests" },
   { href: "/staff/flags", label: "Flagged content" },
   { href: "/staff/editors", label: "Editors" },
