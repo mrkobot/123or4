@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { SubmitButton } from "@/components/SubmitButton";
 import { PhotoDropzone } from "@/components/PhotoDropzone";
-import { Bi } from "@/components/LanguageProvider";
+import { Bi, useLanguage } from "@/components/LanguageProvider";
 
 const CATEGORIES = [
   { value: "hiring", en: "Hiring", zh: "徵才" },
@@ -49,6 +49,7 @@ export function PostForm({
   formAction: (formData: FormData) => void;
   error?: string;
 }) {
+  const siteLang = useLanguage();
   const [language, setLanguage] = useState<"en" | "zh">("en");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
@@ -70,7 +71,7 @@ export function PostForm({
         >
           {CATEGORIES.map((c) => (
             <option key={c.value} value={c.value}>
-              {c.en} / {c.zh}
+              {siteLang === "zh" ? c.zh : c.en}
             </option>
           ))}
         </select>
@@ -85,15 +86,15 @@ export function PostForm({
           onChange={(e) => setLanguage(e.target.value as "en" | "zh")}
           className="mt-1 w-full rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
         >
-          <option value="en">English / 英文</option>
-          <option value="zh">Traditional Chinese / 繁體中文</option>
+          <option value="en">{siteLang === "zh" ? "英文" : "English"}</option>
+          <option value="zh">{siteLang === "zh" ? "繁體中文" : "Traditional Chinese"}</option>
         </select>
       </label>
 
       <input
         name="title"
         type="text"
-        placeholder="Title / 標題"
+        placeholder={language === "zh" ? "標題" : "Title"}
         required
         value={title}
         onChange={(e) => setTitle(e.target.value)}
@@ -101,7 +102,7 @@ export function PostForm({
       />
       <textarea
         name="body"
-        placeholder="Details / 內容"
+        placeholder={language === "zh" ? "內容" : "Details"}
         required
         rows={5}
         value={body}
@@ -150,7 +151,7 @@ export function PostForm({
 
       <SubmitButton
         formAction={formAction}
-        pendingLabel="Posting... / 張貼中..."
+        pendingLabel={siteLang === "zh" ? "張貼中..." : "Posting..."}
         className="rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
       >
         <Bi en="Post listing" zh="張貼廣告" />

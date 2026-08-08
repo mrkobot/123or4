@@ -29,7 +29,8 @@ export default async function RootLayout({
 
   return (
     <html
-      lang="en"
+      lang={lang}
+      data-lang={lang}
       className={`${plusJakartaSans.variable} ${notoSansTC.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">

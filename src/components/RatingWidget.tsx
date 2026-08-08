@@ -3,7 +3,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/utils/supabase/client";
-import { RATING_LABELS, RATE_HEX, RATE_BG_CLASS, RATE_TEXT_CLASS } from "@/utils/ratings";
+import { RATING_LABELS, RATE_HEX } from "@/utils/ratings";
 import { Bi } from "@/components/LanguageProvider";
 
 const CONFETTI_DOTS = 5;
@@ -39,78 +39,109 @@ function quartileFromClientX(track: HTMLElement, clientX: number) {
   return Math.min(4, Math.max(1, Math.ceil(ratio * 4)));
 }
 
-function GradientTrack({
+// The "Vote" pill is the thumb — there's no separate instructional text
+// above the track. At rest it just reads "Vote"; dragging relabels it
+// live with the rate word; once cast, it stays parked on a dimmed track
+// as the permanent "you rated this" marker instead of swapping to a
+// different component.
+function VoteTrack({
+  lockedValue,
   disabled,
   onCommit,
 }: {
+  lockedValue: number | null;
   disabled: boolean;
-  onCommit: (value: number, thumb: HTMLElement) => void;
+  onCommit: (value: number, pill: HTMLElement) => void;
 }) {
   const trackRef = useRef<HTMLDivElement>(null);
-  const thumbRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
   const [hoverValue, setHoverValue] = useState<number | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const locked = lockedValue != null;
 
-  function handleMove(e: React.MouseEvent) {
-    if (!trackRef.current) return;
+  function handlePointerDown(e: React.PointerEvent) {
+    if (locked || disabled || !trackRef.current) return;
+    (e.target as HTMLElement).setPointerCapture(e.pointerId);
+    setDragging(true);
     setHoverValue(quartileFromClientX(trackRef.current, e.clientX));
   }
 
-  function handleClick(e: React.MouseEvent) {
-    if (disabled || !trackRef.current || !thumbRef.current) return;
-    const value = quartileFromClientX(trackRef.current, e.clientX);
-    setHoverValue(value);
-    onCommit(value, thumbRef.current);
+  function handlePointerMove(e: React.PointerEvent) {
+    if (locked || disabled || !trackRef.current) return;
+    if (e.pointerType !== "mouse" && !dragging) return;
+    setHoverValue(quartileFromClientX(trackRef.current, e.clientX));
   }
 
-  const thumbLeft = hoverValue != null ? `${((hoverValue - 0.5) / 4) * 100}%` : null;
+  function handlePointerUp(e: React.PointerEvent) {
+    if (!dragging || locked || disabled || !trackRef.current || !pillRef.current) return;
+    setDragging(false);
+    const value = quartileFromClientX(trackRef.current, e.clientX);
+    setHoverValue(value);
+    onCommit(value, pillRef.current);
+  }
+
+  function handlePointerLeave() {
+    if (!dragging) setHoverValue(null);
+  }
+
+  const activeValue = lockedValue ?? hoverValue;
+  const pillLeft = activeValue != null ? `${((activeValue - 0.5) / 4) * 100}%` : "50%";
+  const pillColor = activeValue != null ? RATE_HEX[activeValue] : "var(--text-secondary)";
 
   return (
     <div className="mt-2">
       <div
         ref={trackRef}
-        onMouseMove={handleMove}
-        onMouseLeave={() => setHoverValue(null)}
-        onClick={handleClick}
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerLeave={handlePointerLeave}
         role="slider"
         aria-label="Rate 1 to 4"
         aria-valuemin={1}
         aria-valuemax={4}
-        aria-valuenow={hoverValue ?? undefined}
-        tabIndex={0}
-        className={`relative h-3.5 w-full rounded-full ${disabled ? "" : "cursor-pointer"}`}
+        aria-valuenow={activeValue ?? undefined}
+        aria-disabled={locked || disabled}
+        tabIndex={locked ? -1 : 0}
+        className={`relative h-2.5 w-full rounded-full transition-opacity ${locked ? "opacity-40" : disabled ? "" : "cursor-pointer"}`}
         style={{
           background:
             "linear-gradient(90deg, var(--rate-1), var(--rate-2), var(--rate-3), var(--rate-4))",
+          touchAction: "none",
         }}
       >
-        {thumbLeft && (
-          <div
-            ref={thumbRef}
-            className="absolute top-1/2 h-6 w-6 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white transition-[left] duration-150"
-            style={{
-              left: thumbLeft,
-              border: `3px solid ${RATE_HEX[hoverValue as number]}`,
-              boxShadow: "0 0 0 1px rgba(20,24,31,0.08)",
-            }}
-          />
-        )}
-      </div>
-      <div className="mt-1.5 flex items-center justify-between text-[10px] font-bold text-text-secondary">
-        <span>
-          <Bi en={RATING_LABELS[1].en} zh={RATING_LABELS[1].zh} />
-        </span>
-        <span
-          className="text-xs font-bold"
-          style={{ color: hoverValue != null ? RATE_HEX[hoverValue] : undefined }}
+        <div
+          ref={pillRef}
+          className="absolute top-1/2 flex h-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center whitespace-nowrap rounded-full bg-surface px-3.5 text-xs font-bold"
+          style={{
+            left: pillLeft,
+            border: `2px solid ${pillColor}`,
+            color: activeValue != null ? pillColor : "var(--text-secondary)",
+            background: locked && activeValue != null ? pillColor : undefined,
+            boxShadow: "0 2px 6px rgba(20,24,31,0.15)",
+          }}
         >
-          {hoverValue != null && (
-            <Bi en={RATING_LABELS[hoverValue].en} zh={RATING_LABELS[hoverValue].zh} />
+          {activeValue == null ? (
+            <Bi en="Vote" zh="投票" />
+          ) : (
+            <span style={{ color: locked ? "white" : pillColor }} className="flex items-center gap-1">
+              {activeValue}
+              <span className="opacity-80">·</span>
+              <Bi en={RATING_LABELS[activeValue].en} zh={RATING_LABELS[activeValue].zh} />
+            </span>
           )}
-        </span>
-        <span>
-          <Bi en={RATING_LABELS[4].en} zh={RATING_LABELS[4].zh} />
-        </span>
+        </div>
       </div>
+      {!locked && (
+        <div className="mt-1.5 flex items-center justify-between text-[10px] font-bold text-text-secondary">
+          <span>
+            <Bi en={RATING_LABELS[1].en} zh={RATING_LABELS[1].zh} />
+          </span>
+          <span>
+            <Bi en={RATING_LABELS[4].en} zh={RATING_LABELS[4].zh} />
+          </span>
+        </div>
+      )}
     </div>
   );
 }
@@ -129,7 +160,6 @@ export function RatingWidget({
 }) {
   const [pending, setPending] = useState(false);
   const [myRating, setMyRating] = useState<number | null>(null);
-  const [committing, setCommitting] = useState<number | null>(null);
   const router = useRouter();
   const supabase = createClient();
 
@@ -156,8 +186,8 @@ export function RatingWidget({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [itemType, itemId]);
 
-  async function rate(value: number, thumb: HTMLElement) {
-    if (myRating != null || committing != null) return;
+  async function rate(value: number, pill: HTMLElement) {
+    if (myRating != null || pending) return;
 
     const {
       data: { user },
@@ -167,10 +197,13 @@ export function RatingWidget({
       return;
     }
 
-    burstConfetti(thumb, RATE_HEX[value]);
-    onVote?.(value);
-    setCommitting(value);
+    // Lock the pill in place immediately (optimistic) so the confetti
+    // bursts right where it lands, instead of waiting on the network
+    // round-trip before the UI settles.
+    setMyRating(value);
     setPending(true);
+    burstConfetti(pill, RATE_HEX[value]);
+    onVote?.(value);
 
     await supabase.rpc("cast_rating", {
       p_item_type: itemType,
@@ -178,28 +211,8 @@ export function RatingWidget({
       p_value: value,
     });
     setPending(false);
-
-    // Let the confetti/pop animation finish before swapping to the
-    // locked "you voted" state, instead of cutting it off mid-play.
-    setTimeout(() => {
-      setMyRating(value);
-      router.refresh();
-    }, 550);
+    router.refresh();
   }
 
-  if (myRating != null) {
-    return (
-      <div
-        className={`mt-2 flex w-fit items-center gap-2 rounded-xl px-4 py-2 ${RATE_BG_CLASS[myRating]} ${RATE_TEXT_CLASS[myRating]}`}
-      >
-        <span className="text-xl font-extrabold leading-none">{myRating}</span>
-        <span className="text-xs font-bold">
-          <Bi en="You rated this" zh="你的評分" />{" "}
-          <Bi en={RATING_LABELS[myRating].en} zh={RATING_LABELS[myRating].zh} />
-        </span>
-      </div>
-    );
-  }
-
-  return <GradientTrack disabled={pending || committing != null} onCommit={rate} />;
+  return <VoteTrack lockedValue={myRating} disabled={pending} onCommit={rate} />;
 }

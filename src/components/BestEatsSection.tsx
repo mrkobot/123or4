@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
-import { Bi, TitlePair } from "@/components/LanguageProvider";
+import { Bi, TitlePair, useLanguage } from "@/components/LanguageProvider";
 import { RATE_HEX } from "@/utils/ratings";
 import { EditorPill, CommunityPill } from "@/components/ScoreBadges";
 
@@ -34,6 +34,7 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
   const [location, setLocation] = useState("all");
   const [query, setQuery] = useState("");
   const [flashRate, setFlashRate] = useState<number | null>(null);
+  const lang = useLanguage();
 
   const locations = useMemo(
     () => Array.from(new Set(reviews.map((r) => locationOf(r.restaurant?.address ?? null)))),
@@ -58,6 +59,16 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
   if (reviews.length === 0) return null;
 
   const [featured, ...rest] = filtered.length > 0 ? filtered : reviews;
+  const featuredBody = featured
+    ? lang === "zh"
+      ? (featured.body_zh ?? featured.body_en)
+      : (featured.body_en ?? featured.body_zh)
+    : null;
+  const featuredBodyIsZh = featured
+    ? lang === "zh"
+      ? !!featured.body_zh
+      : !featured.body_en && !!featured.body_zh
+    : false;
 
   function handleVote(value: number) {
     setFlashRate(value);
@@ -74,7 +85,7 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search cuisine, dish, restaurant / 搜尋菜系、餐點、餐廳"
+          placeholder={lang === "zh" ? "搜尋菜系、餐點、餐廳" : "Search cuisine, dish, restaurant"}
           className="w-full max-w-xs rounded-full border border-border bg-surface px-4 py-2 text-sm text-foreground shadow-[var(--shadow-card)]"
         />
       </div>
@@ -153,8 +164,11 @@ export function BestEatsSection({ reviews }: { reviews: Review[] }) {
               </p>
             )}
 
-            <p className="mt-4 text-foreground/80">{featured.body_en}</p>
-            <p className="font-tc mt-2 text-foreground/80">{featured.body_zh}</p>
+            {featuredBody && (
+              <p className={`mt-4 text-foreground/80 ${featuredBodyIsZh ? "font-tc" : ""}`}>
+                {featuredBody}
+              </p>
+            )}
 
             <RatingWidget
               itemType="review"

@@ -2,6 +2,7 @@ import { login, signup } from "./actions";
 import { GoogleSignInButton } from "@/components/GoogleSignInButton";
 import { SubmitButton } from "@/components/SubmitButton";
 import { Bi } from "@/components/LanguageProvider";
+import { getLanguage, pick } from "@/utils/language";
 
 export default async function LoginPage({
   searchParams,
@@ -9,6 +10,7 @@ export default async function LoginPage({
   searchParams: Promise<{ error?: string; message?: string }>;
 }) {
   const { error, message } = await searchParams;
+  const lang = await getLanguage();
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-16">
@@ -29,14 +31,14 @@ export default async function LoginPage({
           <input
             name="email"
             type="email"
-            placeholder="Email / 電子郵件"
+            placeholder={pick(lang, "Email", "電子郵件")}
             required
             className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
           />
           <input
             name="password"
             type="password"
-            placeholder="Password / 密碼"
+            placeholder={pick(lang, "Password", "密碼")}
             required
             minLength={6}
             className="rounded-lg border border-border bg-surface px-4 py-3 text-foreground"
@@ -46,14 +48,14 @@ export default async function LoginPage({
           <div className="flex gap-3">
             <SubmitButton
               formAction={login}
-              pendingLabel="Signing in... / 登入中..."
+              pendingLabel={pick(lang, "Signing in...", "登入中...")}
               className="flex-1 rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-[var(--shadow-card)] transition-shadow hover:shadow-[var(--shadow-card-hover)]"
             >
               <Bi en="Sign in" zh="登入" />
             </SubmitButton>
             <SubmitButton
               formAction={signup}
-              pendingLabel="Signing up... / 註冊中..."
+              pendingLabel={pick(lang, "Signing up...", "註冊中...")}
               className="flex-1 rounded-full border border-border px-5 py-3 text-sm font-bold text-foreground transition-colors hover:bg-surface-muted"
             >
               <Bi en="Sign up" zh="註冊" />

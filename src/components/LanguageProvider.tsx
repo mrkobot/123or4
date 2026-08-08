@@ -22,8 +22,10 @@ export function useLanguage() {
   return useContext(LanguageContext);
 }
 
-// Renders both languages together, ordered so the current toggle
-// language appears first/more prominent — never hides either one.
+// Renders only the currently active language — the toggle fully
+// switches the site's display language rather than showing both at
+// once (locked 2026-08-07, supersedes the earlier "always show both"
+// rule).
 export function Bi({
   en,
   zh,
@@ -36,30 +38,16 @@ export function Bi({
   zhClassName?: string;
 }) {
   const lang = useLanguage();
-  const enSpan = (
-    <span key="en" className={className}>
-      {en}
-    </span>
-  );
-  const zhSpan = (
-    <span key="zh" className={`font-tc ${zhClassName ?? className ?? ""}`}>
-      {zh}
-    </span>
-  );
   return lang === "zh" ? (
-    <>
-      {zhSpan} {enSpan}
-    </>
+    <span className={`font-tc ${zhClassName ?? className ?? ""}`}>{zh}</span>
   ) : (
-    <>
-      {enSpan} {zhSpan}
-    </>
+    <span className={className}>{en}</span>
   );
 }
 
-// For headline-scale content (post/restaurant titles): the toggle
-// language renders as the prominent headline, the other language as a
-// smaller subhead directly below — never hidden, just de-emphasized.
+// For headline-scale content (post/restaurant titles): renders only
+// the active language's title, falling back to the other language if
+// the active one is missing (e.g. translation still pending).
 export function TitlePair({
   en,
   zh,
@@ -72,21 +60,14 @@ export function TitlePair({
   subClassName?: string;
 }) {
   const lang = useLanguage();
-  const [head, headIsZh, sub, subIsZh] =
+  const [primary, primaryIsZh, fallback, fallbackIsZh] =
     lang === "zh" ? [zh, true, en, false] : [en, false, zh, true];
+  const head = primary || fallback;
+  const headIsZh = primary ? primaryIsZh : fallbackIsZh;
 
-  return (
-    <>
-      {head && (
-        <h2 className={`${headClassName ?? ""} ${headIsZh ? "font-tc" : ""}`}>
-          {head}
-        </h2>
-      )}
-      {sub && (
-        <p className={`${subClassName ?? ""} ${subIsZh ? "font-tc" : ""}`}>
-          {sub}
-        </p>
-      )}
-    </>
-  );
+  return head ? (
+    <h2 className={`${headClassName ?? subClassName ?? ""} ${headIsZh ? "font-tc" : ""}`}>
+      {head}
+    </h2>
+  ) : null;
 }

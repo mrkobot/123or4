@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { RatingWidget } from "@/components/RatingWidget";
 import { PhotoCarousel } from "@/components/PhotoCarousel";
 import { PlaceholderPhoto } from "@/components/PlaceholderPhoto";
-import { Bi, TitlePair } from "@/components/LanguageProvider";
+import { Bi, TitlePair, useLanguage } from "@/components/LanguageProvider";
 import { RATE_HEX } from "@/utils/ratings";
 import { EditorShieldBadge, CommunityPill } from "@/components/ScoreBadges";
 
@@ -43,19 +43,22 @@ const CATEGORY_TEXT: Record<string, string> = {
   services: "text-cat-services",
 };
 
-function relativeTime(iso: string) {
+function relativeTime(iso: string, lang: "en" | "zh") {
   const diffMs = Date.now() - new Date(iso).getTime();
   const hours = Math.floor(diffMs / 3_600_000);
-  if (hours < 1) return "just now";
-  if (hours < 24) return `${hours}h ago`;
+  if (hours < 1) return lang === "zh" ? "剛剛" : "just now";
+  if (hours < 24) return lang === "zh" ? `${hours}小時前` : `${hours}h ago`;
   const days = Math.floor(hours / 24);
-  if (days === 1) return "today";
-  return `${days}d ago`;
+  if (days === 1) return lang === "zh" ? "今天" : "today";
+  return lang === "zh" ? `${days}天前` : `${days}d ago`;
 }
 
 function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
   const cat = CATEGORIES.find((c) => c.value === listing.category);
   const [flashRate, setFlashRate] = useState<number | null>(null);
+  const lang = useLanguage();
+  const body = lang === "zh" ? (listing.body_zh ?? listing.body_en) : (listing.body_en ?? listing.body_zh);
+  const bodyIsZh = lang === "zh" ? !!listing.body_zh : !listing.body_en && !!listing.body_zh;
 
   function handleVote(value: number) {
     setFlashRate(value);
@@ -77,14 +80,14 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         <PlaceholderPhoto category={listing.category} />
       )}
 
-      <div className="flex flex-col gap-2 p-6">
-        <div className="flex items-start justify-between gap-3">
+      <div className="flex flex-col gap-1.5 p-3 sm:gap-2 sm:p-6">
+        <div className="flex items-start justify-between gap-2 sm:gap-3">
           <span
-            className={`w-fit rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
+            className={`w-fit rounded-full bg-foreground px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide sm:px-2.5 sm:py-1 sm:text-[11px] ${CATEGORY_TEXT[listing.category] ?? "text-white"}`}
           >
             {cat ? <Bi en={cat.en} zh={cat.zh} /> : listing.category}
           </span>
-          <div className="flex shrink-0 flex-col items-end gap-1.5">
+          <div className="flex shrink-0 flex-col items-end gap-1 sm:gap-1.5">
             {listing.staff_rating != null && (
               <EditorShieldBadge value={listing.staff_rating} />
             )}
@@ -97,33 +100,36 @@ function ListingCard({ listing, delay }: { listing: Listing; delay: number }) {
         <TitlePair
           en={listing.title_en}
           zh={listing.title_zh}
-          headClassName="text-2xl font-extrabold tracking-tight text-foreground"
-          subClassName="text-sm font-bold text-text-secondary"
+          headClassName="text-sm font-extrabold tracking-tight text-foreground sm:text-2xl"
         />
         {listing.price != null && (
-          <p className="text-lg font-extrabold text-foreground">
+          <p className="text-sm font-extrabold text-foreground sm:text-lg">
             ${listing.price.toLocaleString()}
             {listing.category === "rentals" && (
-              <span className="text-sm font-bold text-text-secondary">
+              <span className="text-xs font-bold text-text-secondary sm:text-sm">
                 {" "}
                 /<Bi en="mo" zh="月" />
               </span>
             )}
           </p>
         )}
-        {listing.body_en && <p className="text-foreground/80">{listing.body_en}</p>}
-        {listing.body_zh && (
-          <p className="font-tc text-foreground/80">{listing.body_zh}</p>
+        {body && (
+          <p className={`line-clamp-2 text-xs text-foreground/80 sm:text-base ${bodyIsZh ? "font-tc" : ""}`}>
+            {body}
+          </p>
         )}
 
-        <div className="flex items-center gap-2 text-xs text-text-secondary">
+        <div className="flex items-center gap-1.5 text-[10px] text-text-secondary sm:gap-2 sm:text-xs">
           {listing.verified && (
-            <span className="rounded-full bg-foreground px-2.5 py-1 text-[11px] font-bold uppercase text-white">
+            <span className="rounded-full bg-foreground px-2 py-0.5 text-[9px] font-bold uppercase text-white sm:px-2.5 sm:py-1 sm:text-[11px]">
               <Bi en="Verified" zh="已驗證" />
             </span>
           )}
           <span>
-            {listing.city?.[0]?.name ?? "Phoenix"} · {relativeTime(listing.created_at)}
+            {lang === "zh" && (listing.city?.[0]?.name ?? "Phoenix") === "Phoenix"
+              ? "鳳凰城"
+              : (listing.city?.[0]?.name ?? "Phoenix")}{" "}
+            · {relativeTime(listing.created_at, lang)}
           </span>
         </div>
 
@@ -166,9 +172,9 @@ export function ListingsBrowser({ listings }: { listings: Listing[] }) {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-3">
         {filtered.length === 0 && (
-          <p className="text-text-secondary">
+          <p className="col-span-2 text-text-secondary lg:col-span-3">
             <Bi
               en="No listings in this category yet — be the first to post."
               zh="此分類尚無刊登——成為第一個張貼的人。"
